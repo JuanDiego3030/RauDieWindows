@@ -126,7 +126,7 @@
               <!-- Tipo de Proyecto -->
               <div class="mb-3">
                 <label for="projectType" class="form-label">Tipo de Proyecto</label>
-                <select class="form-select" id="projectType" name="tipo" required>
+                <select class="form-select" id="projectType" name="tipo" placeholder="Ingresa el nombre del proyecto" required>
                   <option selected disabled>Selecciona el tipo de proyecto</option>
                   <option value="desarrollo-web">Desarrollo Web</option>
                   <option value="diseno-grafico">Diseño Gráfico</option>
@@ -242,6 +242,25 @@
       modifyProjectDescriptionInput.value = descripcion;
       modifyProjectRequirementsInput.value = requerimientos;
     });
+
+      // Validar el formulario antes de enviar
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function(event) {
+      const projectName = document.getElementById('projectName').value.trim();
+      const projectType = document.getElementById('projectType').value;
+      const projectDescription = document.getElementById('projectDescription').value.trim();
+      const projectRequirements = document.getElementById('projectRequirements').value.trim();
+
+      // Verificar si algún campo está vacío
+      if (!projectName || projectType === "Selecciona el tipo de proyecto" || !projectDescription || !projectRequirements) {
+        alert("Por favor, completa todos los campos antes de enviar.");
+        event.preventDefault(); // Evitar el envío del formulario
+      }
+    });
+  });
+
   </script>
 </body>
 

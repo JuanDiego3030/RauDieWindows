@@ -17,15 +17,20 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
   <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
+  <style>
+    .btn-small {
+      padding: 0.25rem 0.5rem; /* Ajustar el padding para botones más pequeños */
+      font-size: 0.875rem; /* Tamaño de fuente más pequeño */
+      margin-right: 0.5rem; /* Margen a la derecha para separación */
+    }
+  </style>
 </head>
 
 <body class="dashboard-page">
@@ -81,37 +86,78 @@
     </section>
     <!-- End Dashboard Overview -->
 
-<!-- Project Management Section -->
-<section id="projects" class="projects section">
-  <div class="container">
-    <div class="row d-flex justify-content-between align-items-center mb-4">
-      <div class="col-lg-6">
+    <!-- Project Management Section -->
+    <section id="projects" class="projects section">
+      <div class="container">
         <h3>Proyectos Actuales</h3>
-      </div>
-    </div>
 
-    <div class="row gy-4">
-      {% for proyecto in proyectos %}
-        <div class="col-lg-4">
-          <div class="card rounded shadow-sm">
-            <div class="card-body">
-              <h4 class="card-title">{{ proyecto.nombre }}</h4>
-              <p><strong>Cliente:</strong> {{ proyecto.cliente }}</p>
-              <p><strong>Descripción:</strong> {{ proyecto.descripcion }}</p>
-              <p><strong>Requerimientos Principales:</strong> {{ proyecto.requerimientos }}</p>
-              <!-- Añade más detalles del proyecto según sea necesario -->
+        <div class="row gy-4">
+          {% for proyecto in proyectos %}
+            <div class="col-lg-4">
+              <div class="card rounded shadow-sm">
+                <div class="card-body">
+                  <h4 class="card-title">{{ proyecto.nombre }}</h4>
+                  <p><strong>Cliente:</strong> {{ proyecto.cliente }}</p>
+                  <p><strong>Descripción:</strong> {{ proyecto.descripcion }}</p>
+                  <p><strong>Requerimientos:</strong> {{ proyecto.requerimientos }}</p>
+                  <p><strong>Tipo de Proyecto:</strong> {{ proyecto.tipo }}</p>
+                  <p><strong>Fecha de Inicio:</strong> {{ proyecto.fecha_inicio }}</p>
+
+                  <!-- Estatus del proyecto con color dinámico -->
+                  <p><strong>Estatus:</strong>
+                    <span class="badge 
+                      {% if proyecto.estado == 'Completado' %}bg-success{% elif proyecto.estado == 'En progreso' %}bg-warning{% elif proyecto.estado == 'Pendiente' %}bg-danger{% else %}bg-secondary{% endif %}">
+                      {{ proyecto.estado }}
+                    </span>
+                  </p>
+
+                  <!-- Botones para cambiar estatus y eliminar -->
+                  <div class="d-flex justify-content-between">
+                    <button class="btn btn-primary btn-small" data-bs-toggle="modal" data-bs-target="#modal-{{ proyecto.id }}">Cambiar Estado</button>
+                    <form method="POST" action="{% url 'panel_control' %}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este proyecto?');">
+                      {% csrf_token %}
+                      <input type="hidden" name="proyecto_id" value="{{ proyecto.id }}">
+                      <button class="btn btn-danger btn-small" type="submit" name="eliminar_proyecto">Eliminar</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+
+            <!-- Modal para cambiar estatus -->
+            <div class="modal fade" id="modal-{{ proyecto.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ proyecto.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel-{{ proyecto.id }}">Cambiar Estado del Proyecto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form method="POST" action="{% url 'panel_control' %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="proyecto_id" value="{{ proyecto.id }}">
+                      <label for="estado">Estado del proyecto:</label>
+                      <select name="estado" id="estado" required>
+                          <option value="Planeando" {% if proyecto.estado == "Planeando" %}selected{% endif %}>Planeando</option>
+                          <option value="En progreso" {% if proyecto.estado == "En progreso" %}selected{% endif %}>En progreso</option>
+                          <option value="Completado" {% if proyecto.estado == "Completado" %}selected{% endif %}>Completado</option>
+                      </select>
+                      <button type="submit" name="cambiar_estatus" class="btn btn-secondary mt-2">Actualizar Estatus</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          {% empty %}
+            <div class="col-lg-12 text-center">
+              <p>No hay proyectos registrados actualmente.</p>
+            </div>
+          {% endfor %}
         </div>
-      {% empty %}
-        <div class="col-lg-12 text-center">
-          <p>No hay proyectos registrados actualmente.</p>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-<!-- End Project Management Section -->
+      </div>
+    </section>
+    <!-- End Project Management Section -->
 
     <!-- Task Management Section -->
     <section id="tasks" class="tasks section">
@@ -140,6 +186,7 @@
               </div>
             </div>
           </div>
+          <!-- Fin Tarea 1 -->
 
           <!-- Tarea 2 -->
           <div class="col-lg-4">
@@ -162,6 +209,7 @@
               </div>
             </div>
           </div>
+          <!-- Fin Tarea 2 -->
 
           <!-- Tarea 3 -->
           <div class="col-lg-4">
@@ -184,57 +232,25 @@
               </div>
             </div>
           </div>
+          <!-- Fin Tarea 3 -->
 
         </div>
       </div>
-    </section><!-- End Task Management Section -->
+    </section>
+    <!-- End Task Management Section -->
 
-    <!-- Team Section -->
-    <section id="team" class="team section">
+    <!-- Footer -->
+    <footer id="footer" class="footer">
       <div class="container">
-        <h3>Equipo</h3>
-        <div class="row gy-4">
-          <div class="col-lg-4">
-            <div class="team-member">
-              <img src="{% static 'img/team1.jpg' %}" alt="Juan Arana" class="img-fluid">
-              <h4>Juan Arana</h4>
-              <p>Desarrollador Backend</p>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="team-member">
-              <img src="{% static 'img/team2.jpg' %}" alt="Raulymar De Abreu" class="img-fluid">
-              <h4>Raulymar De Abreu</h4>
-              <p>Diseñadora UI/UX</p>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="team-member">
-              <img src="{% static 'img/team3.jpg' %}" alt="Ana García" class="img-fluid">
-              <h4>Ana García</h4>
-              <p>Project Manager</p>
-            </div>
+        <div class="row text-center">
+          <div class="col-lg-12">
+            <p>&copy; 2023 RAUDIE. Todos los derechos reservados.</p>
           </div>
         </div>
       </div>
-    </section><!-- End Team Section -->
+    </footer><!-- End Footer -->
 
   </main>
-
-  <!-- Footer -->
-  <footer id="footer" class="footer light-background">
-    <div class="container">
-      <div class="copyright text-center">
-        <p>© <strong class="px-1 sitename">RauDie</strong> All Rights Reserved</p>
-      </div>
-      <div class="social-links d-flex justify-content-center">
-        <a href="#"><i class="bi bi-twitter-x"></i></a>
-        <a href="#"><i class="bi bi-facebook"></i></a>
-        <a href="#"><i class="bi bi-instagram"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
-      </div>
-    </div>
-  </footer>
 
   <!-- Vendor JS Files -->
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>

@@ -16,7 +16,30 @@ def control(request):
         return redirect('admin_login')  # Redirige al login si no está autenticado
 
     proyectos = Proyectos.objects.all()  # Obtener todos los proyectos registrados
-    admin = Admin.objects.get(id=admin_id)  # Obtener información del admin autenticado
+    admin = get_object_or_404(Admin, id=admin_id)  # Obtener información del admin autenticado
+
+    if request.method == 'POST':
+        if 'eliminar_proyecto' in request.POST:
+            proyecto_id = request.POST.get('proyecto_id')
+            proyecto = get_object_or_404(Proyectos, id=proyecto_id)
+            proyecto.delete()
+            messages.success(request, 'Proyecto eliminado correctamente.')
+            return redirect('panel_control')
+
+        if 'cambiar_estatus' in request.POST:
+            proyecto_id = request.POST.get('proyecto_id')
+            nuevo_estatus = request.POST.get('estado')
+
+            if not nuevo_estatus:  # Verificar que el nuevo estado no esté vacío
+                messages.error(request, 'Por favor, selecciona un estado válido.')
+                return redirect('panel_control')
+
+            proyecto = get_object_or_404(Proyectos, id=proyecto_id)
+            proyecto.estado = nuevo_estatus
+            proyecto.save()
+            messages.success(request, 'Estatus del proyecto actualizado.')
+            return redirect('panel_control')
+
     return render(request, 'PanelDeControl.html', {'proyectos': proyectos, 'admin': admin})
 
 
@@ -56,7 +79,7 @@ def seguimiento(request):
             tipo = request.POST.get('tipo')
             requerimientos = request.POST.get('requerimientos')
             descripcion = request.POST.get('descripcion')
-            estado = request.POST.get('estado', 'Iniciado')  # Establecer estado por defecto
+            estado = request.POST.get('estado', 'Planeando')  # Establecer estado por defecto
             fecha_inicio = request.POST.get('fecha_inicio', timezone.now())  # Usa la fecha actual si no se proporciona
 
             nuevo_proyecto = Proyectos(
