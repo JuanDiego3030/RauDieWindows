@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'RauDie.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgresql://postgres:kyLUnRnFvEyqUKTleGcqNDTcBUvPFmNC@postgres.railway.internal:5432/railway')
+    'default': dj_database_url.config(default='postgresql://postgres:kyLUnRnFvEyqUKTleGcqNDTcBUvPFmNC@autorack.proxy.rlwy.net:31516/railway')
 }
 
 
