@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
-    'https://raudie-production.up.railway.app'
+    'raudie-production.up.railway.app'
 ]
 
 
