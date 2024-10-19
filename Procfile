@@ -1,1 +1,1 @@
-web: gunicorn RauDie.wsgi
+web: python manage.py collectstatic && gunicorn RauDie.wsgi
