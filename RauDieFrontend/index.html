@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title> RauDie | Landing Page</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'img/favicon.png' %}" rel="icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+        <img src="{% static 'img/nav img.png' %}" class="sitename" alt="Logo de RauDie">
+        <h1>RAUDIE</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'cliente_login' %}" class="active">Iniciar Seguimiento</a></li>
+          <li><a href="{% url 'admin_login' %}" class="active">Iniciar Control</a></li>
+          <li><a href="#about">Quiénes Somos</a></li>
+          <li><a href="#services">Servicios</a></li>
+          <li><a href="#contact">Contactos</a></li>
+        </ul>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Hero Section -->
+    <section id="hero" class="hero section light-background">
+
+      <div class="container position-relative">
+        <div class="row gy-5">
+          <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
+            <h2>RauDie Software Company</h2>
+            <p>Ofrecemos soluciones tecnológicas a medida para potenciar el crecimiento de tu negocio. Desde desarrollo
+              front-end hasta back-end, te acompañamos en cada paso.</p>
+            <div class="d-flex">
+              <a href="#about" class="btn-get-started">¡Conócenos!</a>
+            </div>
+          </div>
+          <div class="col-lg-6 order-1 order-lg-2">
+            <video width="100%" autoplay muted loop>
+              <source src="{% static 'img/animacion logo.mp4' %}" class="animacion" type="video/mp4">
+              Tu navegador no soporta la etiqueta de video.
+            </video>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /Hero Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section">
+
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-6 content">
+            <p class="who-we-are">¿Quiénes Somos?</p>
+            <h3>RauDie Software: Transformando Ideas en Realidad Digital</h3>
+            <p class="fst-italic">
+              En RauDie Software, somos un equipo apasionado por la tecnología y el desarrollo de software. Nos
+              especializamos en soluciones front-end y back-end, ofreciendo innovación y eficiencia en cada proyecto.
+              Desde interfaces intuitivas hasta arquitecturas sólidas en la nube, nuestro objetivo es ayudar a las
+              empresas a escalar y crecer con confianza.
+            </p>
+            <ul>
+              <li><i class="bi bi-check-circle"></i> Innovación</li>
+              <li><i class="bi bi-check-circle"></i> Colaboración</li>
+              <li><i class="bi bi-check-circle"></i> Calidad</li>
+            </ul>
+          </div>
+          <div class="col-lg-6">
+            <img src="{% static 'img/programming.svg' %}" alt="Programación">
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /About Section -->
+
+    <!-- Services Section -->
+    <section id="services" class="services section">
+      <div class="container">
+        <h2>Servicios Disponibles</h2>
+        <br>
+        <div class="fila_n1">
+          <div class="col-lg-4 col-md-6">
+            <div class="service-item position-relative">
+              <div class="icon">
+                <i class="bi bi-window-stack"></i>
+              </div>
+              <h3>Desarrollo de Sitios Web Personalizados</h3>
+              <p><b>Sitios web a medida:</b> Diseño y desarrollo de sitios web adaptados a las necesidades del cliente.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="service-item position-relative">
+              <div class="icon">
+                <i class="bi bi-code-slash"></i>
+              </div>
+              <h3>Mantenimiento de Sitios Web</h3>
+              <p><b>Actualizaciones:</b> Actualización regular de contenido y funciones en el sitio web.</p>
+            </div>
+          </div>
+        </div>
+        <div class="fila_n2">
+          <div class="col-lg-4 col-md-6">
+            <div class="service-item position-relative">
+              <div class="icon">
+                <i class="bi bi-credit-card-2-front-fill"></i>
+              </div>
+              <h3>Diseño Web Básico</h3>
+              <p><b>Diseño UX/UI:</b> Diseño centrado en la experiencia del usuario, asegurando que la navegación sea clara y atractiva.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="service-item position-relative">
+              <div class="icon">
+                <i class="bi bi-ui-radios"></i>
+              </div>
+              <h3>Implementación de Formularios y Automatización</h3>
+              <p><b>Formularios personalizados:</b> Creación de formularios para captar clientes o solicitudes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- /Services Section -->
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
+      <div class="container">
+        <h2>Contactos</h2>
+        <div><span>¿Necesitas ayuda?</span> <span class="description-title">Contáctanos</span></div>
+
+        <div class="row gy-4">
+          <div class="col-lg-4">
+            <div class="info-item d-flex">
+              <i class="bi bi-telephone flex-shrink-0"></i>
+              <div>
+                <h3>Número Telefónico</h3>
+                <a href="tel:+584127360431">+58 412-7360431</a>
+                <br>
+                <a href="tel:+584243284360">+58 424-3284360</a>
+              </div>
+            </div>
+            <div class="info-item d-flex">
+              <i class="bi bi-envelope flex-shrink-0"></i>
+              <div>
+                <h3>Correos Electrónicos</h3>
+                <a href="mailto:rau30ly@gmail.com">rau30ly@gmail.com</a>
+                <a href="mailto:juandiegoaranaperez@gmail.com">juandiegoaranaperez@gmail.com</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <form action="" method="post" class="php-email-form">
+              <div class="row gy-4">
+                <div class="col-md-6">
+                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+                </div>
+                <div class="col-md-6">
+                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+                </div>
+                <div class="col-md-12">
+                  <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+                </div>
+                <div class="col-md-12">
+                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+                </div>
+                <div class="col-md-12 text-center">
+                  <button type="submit">Send Message</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section><!-- /Contact Section -->
+  </main>
+
+  <footer id="footer" class="footer light-background">
+    <div class="container">
+      <div class="copyright text-center">
+        <p>© <strong class="px-1 sitename">RauDie</strong> All Rights Reserved</p>
+      </div>
+      <div class="social-links d-flex justify-content-center">
+        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <a href="#"><i class="bi bi-facebook"></i></a>
+        <a href="#"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/php-email-form/validate.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+
+</html>

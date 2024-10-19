@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>RauDie | Iniciar Sesión</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'img/favicon.png' %}" rel="icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      <a href="{% url 'index' %}" class="logo d-flex align-items-center">
+        <img src="{% static 'img/nav img.png' %}" class="sitename" alt="Logo de RauDie">
+        <h1>RAUDIE</h1>
+      </a>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Section: Iniciar Sesión -->
+    <section id="login-section" class="login section light-background">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-5 col-md-8">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h1 class="text-center mb-4">Iniciar Sesión</h1>
+
+                <form method="POST"  action="{% url 'admin_register'%}">
+                  {% csrf_token %}
+                  <div class="md-3">
+                    <label for="text" class="form-label">Nombre de usuario</label>
+                    <input type="text" name="name" class="form-control" id="nombre" placeholder="Your Name" required="">
+                  </div>
+                  <div class="mb-3">
+                    <label for="email" class="form-label">Correo Electronico</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Introduce tu correo electronico" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Introduce tu contraseña" required>
+                  </div>
+                  <button class="button text-center" type="submit">Registrar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- /Section: Iniciar Sesión -->
+  </main>
+
+  <footer id="footer" class="footer light-background">
+    <div class="container">
+      <div class="copyright text-center">
+        <p>© <strong class="px-1 sitename">RauDie</strong> Todos los derechos reservados</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+
+</html>

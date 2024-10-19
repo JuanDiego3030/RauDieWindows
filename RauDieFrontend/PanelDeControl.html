@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Panel de Control - Gestión de Proyectos</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'img/favicon.png' %}" rel="icon">
+  <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+</head>
+
+<body class="dashboard-page">
+
+  <!-- Header -->
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <!-- Enlace al Panel de Control -->
+      <a href="{% url 'panel_control' %}" class="logo d-flex align-items-center">
+        <img src="{% static 'img/nav img.png' %}" class="sitename" alt="Logo de RauDie">
+        <h1>RAUDIE</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="#dashboard" class="active">Panel de Control</a></li>
+          <li><a href="#projects">Proyectos</a></li>
+          <li><a href="#tasks">Tareas</a></li>
+          <li><a href="#team">Equipo</a></li>
+          <li><a href="#reports">Reportes</a></li>
+          <li><a href="#settings">Configuración</a></li>
+        </ul>
+      </nav>
+
+    </div>
+  </header><!-- End Header -->
+
+  <main class="main">
+
+    <!-- Mostrar Mensajes de Django -->
+    <div class="container mt-3">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Dashboard Overview -->
+    <section id="dashboard" class="dashboard section">
+      <div class="container">
+        <div class="row text-center mb-4">
+          <div class="col-lg-12">
+            <h2>Panel de Control</h2>
+            <p>Visión general de los proyectos y progreso actual.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Dashboard Overview -->
+
+<!-- Project Management Section -->
+<section id="projects" class="projects section">
+  <div class="container">
+    <div class="row d-flex justify-content-between align-items-center mb-4">
+      <div class="col-lg-6">
+        <h3>Proyectos Actuales</h3>
+      </div>
+    </div>
+
+    <div class="row gy-4">
+      {% for proyecto in proyectos %}
+        <div class="col-lg-4">
+          <div class="card rounded shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title">{{ proyecto.nombre }}</h4>
+              <p><strong>Cliente:</strong> {{ proyecto.cliente }}</p>
+              <p><strong>Descripción:</strong> {{ proyecto.descripcion }}</p>
+              <p><strong>Requerimientos Principales:</strong> {{ proyecto.requerimientos }}</p>
+              <!-- Añade más detalles del proyecto según sea necesario -->
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-lg-12 text-center">
+          <p>No hay proyectos registrados actualmente.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<!-- End Project Management Section -->
+
+    <!-- Task Management Section -->
+    <section id="tasks" class="tasks section">
+      <div class="container">
+        <h3>Tareas Recientes</h3>
+        <div class="row gy-4">
+          
+          <!-- Tarea 1 -->
+          <div class="col-lg-4">
+            <div class="card rounded shadow-sm">
+              <div class="card-body">
+                <h4 class="card-title">Tarea 1</h4>
+                <p class="card-text">Descripción de la tarea 1.</p>
+                <span class="badge bg-success mb-3">Completada</span>
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonTask1" data-bs-toggle="dropdown" aria-expanded="false">
+                    Cambiar Estatus
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask1">
+                    <li><a class="dropdown-item" href="#">Completada</a></li>
+                    <li><a class="dropdown-item" href="#">En progreso</a></li>
+                    <li><a class="dropdown-item" href="#">Pendiente</a></li>
+                    <li><a class="dropdown-item" href="#">Cancelada</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarea 2 -->
+          <div class="col-lg-4">
+            <div class="card rounded shadow-sm">
+              <div class="card-body">
+                <h4 class="card-title">Tarea 2</h4>
+                <p class="card-text">Descripción de la tarea 2.</p>
+                <span class="badge bg-warning mb-3">En progreso</span>
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonTask2" data-bs-toggle="dropdown" aria-expanded="false">
+                    Cambiar Estatus
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask2">
+                    <li><a class="dropdown-item" href="#">Completada</a></li>
+                    <li><a class="dropdown-item" href="#">En progreso</a></li>
+                    <li><a class="dropdown-item" href="#">Pendiente</a></li>
+                    <li><a class="dropdown-item" href="#">Cancelada</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarea 3 -->
+          <div class="col-lg-4">
+            <div class="card rounded shadow-sm">
+              <div class="card-body">
+                <h4 class="card-title">Tarea 3</h4>
+                <p class="card-text">Descripción de la tarea 3.</p>
+                <span class="badge bg-danger mb-3">Pendiente</span>
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonTask3" data-bs-toggle="dropdown" aria-expanded="false">
+                    Cambiar Estatus
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask3">
+                    <li><a class="dropdown-item" href="#">Completada</a></li>
+                    <li><a class="dropdown-item" href="#">En progreso</a></li>
+                    <li><a class="dropdown-item" href="#">Pendiente</a></li>
+                    <li><a class="dropdown-item" href="#">Cancelada</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section><!-- End Task Management Section -->
+
+    <!-- Team Section -->
+    <section id="team" class="team section">
+      <div class="container">
+        <h3>Equipo</h3>
+        <div class="row gy-4">
+          <div class="col-lg-4">
+            <div class="team-member">
+              <img src="{% static 'img/team1.jpg' %}" alt="Juan Arana" class="img-fluid">
+              <h4>Juan Arana</h4>
+              <p>Desarrollador Backend</p>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="team-member">
+              <img src="{% static 'img/team2.jpg' %}" alt="Raulymar De Abreu" class="img-fluid">
+              <h4>Raulymar De Abreu</h4>
+              <p>Diseñadora UI/UX</p>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="team-member">
+              <img src="{% static 'img/team3.jpg' %}" alt="Ana García" class="img-fluid">
+              <h4>Ana García</h4>
+              <p>Project Manager</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Team Section -->
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer light-background">
+    <div class="container">
+      <div class="copyright text-center">
+        <p>© <strong class="px-1 sitename">RauDie</strong> All Rights Reserved</p>
+      </div>
+      <div class="social-links d-flex justify-content-center">
+        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <a href="#"><i class="bi bi-facebook"></i></a>
+        <a href="#"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+
+</html>
