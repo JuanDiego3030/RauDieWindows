@@ -56,44 +56,52 @@
         <div class="row text-center mb-4">
           <div class="col-lg-12">
             <h2>Panel de Seguimiento</h2>
+            <h3>Bienvenido, {{ nombre_cliente }}!</h3> <!-- Mostrar el nombre del cliente -->
             <p>Revisa el estatus de tus proyectos actuales y gestiona nuevas solicitudes de proyectos.</p>
           </div>
         </div>
       </div>
     </section>
     <!-- End Dashboard Overview -->
-
     <!-- Project Management Section with Timeline -->
     <section id="projects" class="projects section">
       <div class="container">
         <div class="row d-flex justify-content-between align-items-center mb-4">
           <div class="col-lg-12 text-center">
-            <h3>Proyectos Actuales</h3>
+              <h3>Proyectos Actuales</h3>
           </div>
-        </div>
+      </div>
 
         <!-- Project Timeline List -->
         <ul class="timeline list-group">
-          <!-- Proyecto A -->
+          {% for proyecto in proyectos %}
           <li class="list-group-item">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <h4>Proyecto A</h4>
-                <p><strong>Cliente:</strong> Juan Pérez</p>
-                <p><strong>Fecha de inicio:</strong> 01/01/2024</p>
+                <h4>{{ proyecto.nombre }}</h4>
+                <p><strong>Fecha de inicio:</strong> {{ proyecto.fecha_inicio|date:"d/m/Y" }}</p>
                 <h5>Estatus:</h5>
                 <ul>
-                  <li>Iniciado</li>
+                  <li>{{ proyecto.estado }}</li>
                 </ul>
               </div>
               <div>
-                <button class="btn btn-primary mb-2">Solicitar Cambios</button>
+                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modifyProjectModal" data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}" data-tipo="{{ proyecto.tipo }}" data-descripcion="{{ proyecto.descripcion }}" data-requerimientos="{{ proyecto.requerimientos }}">
+                  Solicitar Cambios
+                </button>
               </div>
             </div>
           </li>
-      </div>
+          {% empty %}
+          <li class="list-group-item">
+            <p>No tienes proyectos en este momento.</p>
+          </li>
+          {% endfor %}
+        </ul>
+        <!-- End Project Timeline List -->
+
     </section>
-    <!-- End Project Management Section with Timeline -->
+    <!-- End Project Management Section -->
 
     <!-- Project Request Form Section -->
     <section id="request" class="request section">
@@ -103,79 +111,138 @@
             <h3>Solicitar Nuevo Proyecto</h3>
           </div>
         </div>
-    
+
         <div class="row justify-content-center">
           <div class="col-lg-8">
             <form action="{% url 'panel_seguimiento' %}" method="POST">
               {% csrf_token %} <!-- Token de seguridad -->
-              
-              <!-- Nombre del Cliente -->
-              <div class="mb-3">
-                  <label for="clientName" class="form-label">Nombre del Cliente</label>
-                  <input type="text" class="form-control" id="clientName" name="cliente" placeholder="Ingresa tu nombre" required>
-              </div>
-          
+
               <!-- Nombre del Proyecto -->
               <div class="mb-3">
-                  <label for="projectName" class="form-label">Nombre del Proyecto</label>
-                  <input type="text" class="form-control" id="projectName" name="nombre" placeholder="Ingresa el nombre del proyecto" required>
+                <label for="projectName" class="form-label">Nombre del Proyecto</label>
+                <input type="text" class="form-control" id="projectName" name="nombre" placeholder="Ingresa el nombre del proyecto" required>
               </div>
-              
+
               <!-- Tipo de Proyecto -->
               <div class="mb-3">
-                  <label for="projectType" class="form-label">Tipo de Proyecto</label>
-                  <select class="form-select" id="projectType" name="tipo" required>
-                      <option selected disabled>Selecciona el tipo de proyecto</option>
-                      <option value="desarrollo-web">Desarrollo Web</option>
-                      <option value="diseno-grafico">Diseño Gráfico</option>
-                      <option value="gestion-producto">Gestión de Producto</option>
-                      <option value="marketing">Marketing</option>
-                  </select>
+                <label for="projectType" class="form-label">Tipo de Proyecto</label>
+                <select class="form-select" id="projectType" name="tipo" required>
+                  <option selected disabled>Selecciona el tipo de proyecto</option>
+                  <option value="desarrollo-web">Desarrollo Web</option>
+                  <option value="diseno-grafico">Diseño Gráfico</option>
+                  <option value="gestion-producto">Gestión de Producto</option>
+                  <option value="marketing">Marketing</option>
+                </select>
               </div>
-          
+
               <!-- Descripción del Proyecto -->
               <div class="mb-3">
-                  <label for="projectDescription" class="form-label">Descripción del Proyecto</label>
-                  <textarea class="form-control" id="projectDescription" name="descripcion" rows="4" placeholder="Describe brevemente tu proyecto" required></textarea>
+                <label for="projectDescription" class="form-label">Descripción del Proyecto</label>
+                <textarea class="form-control" id="projectDescription" name="descripcion" rows="4" placeholder="Describe brevemente tu proyecto" required></textarea>
               </div>
-          
+
               <!-- Requerimientos Principales -->
               <div class="mb-3">
-                  <label for="projectRequirements" class="form-label">Requerimientos del Proyecto</label>
-                  <textarea class="form-control" id="projectRequirements" name="requerimientos" rows="4" placeholder="Especifica los requerimientos principales" required></textarea>
+                <label for="projectRequirements" class="form-label">Requerimientos del Proyecto</label>
+                <textarea class="form-control" id="projectRequirements" name="requerimientos" rows="4" placeholder="Especifica los requerimientos principales" required></textarea>
               </div>
-          
+
               <!-- Enviar Formulario -->
               <div class="text-center">
-                  <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+                <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
               </div>
-          </form
+            </form>
           </div>
         </div>
-    
+
       </div>
     </section>
-    
     <!-- End Project Request Form Section -->
+
+    <!-- Modal for Modify Project -->
+    <div class="modal fade" id="modifyProjectModal" tabindex="-1" aria-labelledby="modifyProjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modifyProjectModalLabel">Modificar Proyecto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="{% url 'panel_seguimiento' %}" method="POST">
+              {% csrf_token %}
+              <input type="hidden" id="modifyProjectId" name="proyecto_id" value="">
+
+              <!-- Nombre del Proyecto -->
+              <div class="mb-3">
+                <label for="modifyProjectName" class="form-label">Nombre del Proyecto</label>
+                <input type="text" class="form-control" id="modifyProjectName" name="nombre" required>
+              </div>
+
+              <!-- Tipo de Proyecto -->
+              <div class="mb-3">
+                <label for="modifyProjectType" class="form-label">Tipo de Proyecto</label>
+                <select class="form-select" id="modifyProjectType" name="tipo" required>
+                  <option selected disabled>Selecciona el tipo de proyecto</option>
+                  <option value="desarrollo-web">Desarrollo Web</option>
+                  <option value="diseno-grafico">Diseño Gráfico</option>
+                  <option value="gestion-producto">Gestión de Producto</option>
+                  <option value="marketing">Marketing</option>
+                </select>
+              </div>
+
+              <!-- Descripción del Proyecto -->
+              <div class="mb-3">
+                <label for="modifyProjectDescription" class="form-label">Descripción del Proyecto</label>
+                <textarea class="form-control" id="modifyProjectDescription" name="descripcion" rows="4" required></textarea>
+              </div>
+
+              <!-- Requerimientos Principales -->
+              <div class="mb-3">
+                <label for="modifyProjectRequirements" class="form-label">Requerimientos del Proyecto</label>
+                <textarea class="form-control" id="modifyProjectRequirements" name="requerimientos" rows="4" required></textarea>
+              </div>
+
+              <!-- Enviar Formulario -->
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Modificar Proyecto</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal for Modify Project -->
 
   </main>
 
-  <!-- Footer -->
-  <footer id="footer" class="footer light-background">
-    <div class="container">
-      <div class="copyright text-center">
-        <p>© <strong class="px-1 sitename">RauDie</strong> Todos los derechos reservados</p>
-      </div>
-      <div class="social-links d-flex justify-content-center">
-        <a href="#"><i class="bi bi-twitter"></i></a>
-        <a href="#"><i class="bi bi-facebook"></i></a>
-        <a href="#"><i class="bi bi-instagram"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
-      </div>
-    </div>
-  </footer>
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    const modifyProjectModal = document.getElementById('modifyProjectModal');
+    modifyProjectModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget; // Button that triggered the modal
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+      // Extraer la información de los atributos data-* del botón
+      const proyectoId = button.getAttribute('data-proyecto-id');
+      const nombre = button.getAttribute('data-nombre');
+      const tipo = button.getAttribute('data-tipo');
+      const descripcion = button.getAttribute('data-descripcion');
+      const requerimientos = button.getAttribute('data-requerimientos');
+
+      // Actualizar el contenido del modal
+      const modifyProjectIdInput = document.getElementById('modifyProjectId');
+      const modifyProjectNameInput = document.getElementById('modifyProjectName');
+      const modifyProjectTypeInput = document.getElementById('modifyProjectType');
+      const modifyProjectDescriptionInput = document.getElementById('modifyProjectDescription');
+      const modifyProjectRequirementsInput = document.getElementById('modifyProjectRequirements');
+
+      modifyProjectIdInput.value = proyectoId;
+      modifyProjectNameInput.value = nombre;
+      modifyProjectTypeInput.value = tipo;
+      modifyProjectDescriptionInput.value = descripcion;
+      modifyProjectRequirementsInput.value = requerimientos;
+    });
+  </script>
 </body>
 
 </html>

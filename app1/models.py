@@ -19,10 +19,10 @@ class Cliente(models.Model):
     def __str__(self):
         return self.nombre
 
-# Modelo para los proyectos (sin cambios)
+# Modelo para los proyectos
 class Proyectos(models.Model):
     nombre = models.CharField(max_length=200)
-    cliente = models.CharField(max_length=100)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # Relación con Cliente
     tipo = models.CharField(max_length=100)
     requerimientos = models.TextField()
     descripcion = models.TextField()
@@ -31,4 +31,3 @@ class Proyectos(models.Model):
 
     def __str__(self):
         return self.nombre
-

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .models import Proyectos, Cliente, Admin
 from django.contrib import messages
@@ -26,34 +26,54 @@ def seguimiento(request):
     if not cliente_id:
         return redirect('cliente_login')  # Redirige al login si no está autenticado
 
-    cliente = Cliente.objects.get(id=cliente_id)  # Obtener información del cliente autenticado
+    cliente = get_object_or_404(Cliente, id=cliente_id)  # Obtener información del cliente autenticado
+    proyectos = Proyectos.objects.filter(cliente=cliente)  # Filtrar proyectos del cliente
+    
+    # Contexto inicial con nombre del cliente
+    context = {
+        'cliente': cliente,
+        'proyectos': proyectos,
+        'nombre_cliente': cliente.nombre,  # Asumiendo que el modelo Cliente tiene un campo nombre
+    }
 
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        tipo = request.POST.get('tipo')
-        requerimientos = request.POST.get('requerimientos')
-        descripcion = request.POST.get('descripcion')
-        estado = request.POST.get('estado', 'Iniciado')  # Valor por defecto si no se proporciona
-        fecha_inicio = request.POST.get('fecha_inicio')
+        proyecto_id = request.POST.get('proyecto_id')
 
-        # Si no se proporciona una fecha de inicio, se usa la fecha actual
-        if not fecha_inicio:
-            fecha_inicio = timezone.now().date()  # Obtener solo la fecha actual
+        # Si el proyecto ya existe, actualízalo
+        if proyecto_id:
+            proyecto = get_object_or_404(Proyectos, id=proyecto_id)
+            proyecto.tipo = request.POST.get('tipo', proyecto.tipo)
+            proyecto.requerimientos = request.POST.get('requerimientos', proyecto.requerimientos)
+            proyecto.descripcion = request.POST.get('descripcion', proyecto.descripcion)
+            proyecto.estado = request.POST.get('estado', proyecto.estado)
+            proyecto.fecha_inicio = request.POST.get('fecha_inicio', proyecto.fecha_inicio)
+            proyecto.save()
+            messages.success(request, 'Proyecto actualizado con éxito')
 
-        proyecto = Proyectos(
-            nombre=nombre,
-            cliente=cliente.nombre,  # Guardar el nombre del cliente asociado al proyecto
-            tipo=tipo,
-            requerimientos=requerimientos,
-            descripcion=descripcion,
-            estado=estado,
-            fecha_inicio=fecha_inicio  # Asegurar que tenga un valor
-        )
-        proyecto.save()
+        # Si no hay proyecto_id, crea un nuevo proyecto
+        else:
+            nombre = request.POST.get('nombre')  # Obtener el nombre del proyecto
+            tipo = request.POST.get('tipo')
+            requerimientos = request.POST.get('requerimientos')
+            descripcion = request.POST.get('descripcion')
+            estado = request.POST.get('estado', 'Iniciado')  # Establecer estado por defecto
+            fecha_inicio = request.POST.get('fecha_inicio', timezone.now())  # Usa la fecha actual si no se proporciona
+
+            nuevo_proyecto = Proyectos(
+                cliente=cliente,
+                nombre=nombre,  # Asignar el nombre del proyecto
+                tipo=tipo,
+                requerimientos=requerimientos,
+                descripcion=descripcion,
+                estado=estado,
+                fecha_inicio=fecha_inicio,
+            )
+            nuevo_proyecto.save()
+            messages.success(request, 'Proyecto creado con éxito')
+
         return redirect('panel_seguimiento')  # Redirige al panel de seguimiento
 
-    return render(request, 'PanelDeSeguimiento.html', {'cliente': cliente})
-
+    return render(request, 'PanelDeSeguimiento.html', context)  # Renderiza con el contexto actualizado
 
 # Función personalizada para autenticar usuarios (admin y cliente)
 def custom_authenticate(email, password, user_type):
@@ -136,15 +156,12 @@ def cliente_login(request):
         cliente = custom_authenticate(email=email, password=password, user_type='cliente')
 
         if cliente:
-            request.session['admin_id'] = cliente.id  # Guardar el ID del admin en la sesión
-            return redirect('panel_seguimiento')  # Redirigir al panel de control
+            request.session['cliente_id'] = cliente.id  # Guardar el ID del cliente en la sesión
+            return redirect('panel_seguimiento')  # Redirigir al panel de seguimiento
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
 
     return render(request, 'cliente_login.html')
-
-
-
 
 
 
