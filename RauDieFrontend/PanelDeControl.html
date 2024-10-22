@@ -50,9 +50,7 @@
           <li><a href="#dashboard" class="active">Panel de Control</a></li>
           <li><a href="#projects">Proyectos</a></li>
           <li><a href="#tasks">Tareas</a></li>
-          <li><a href="#team">Equipo</a></li>
-          <li><a href="#reports">Reportes</a></li>
-          <li><a href="#settings">Configuración</a></li>
+          <li><a href="{% url 'logout' %}">Cerrar session</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -255,6 +253,7 @@
 
   <!-- Vendor JS Files -->
   <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
 </body>
 

@@ -62,12 +62,21 @@
                       <input type="email" class="form-control" id="email" name="email" placeholder="Introduce tu correo electronico" required>
                   </div>
                   <div class="mb-3">
-                      <label for="password" class="form-label">Contraseña</label>
+                      <label for="password" class="form-label">Contraseña (Debe tener 8 o mas digitos) </label>
                       <input type="password" class="form-control" id="password" name="password" placeholder="Introduce tu contraseña" required>
                   </div>
                   <button class="button text-center" type="submit">Registrar</button>
               </form>
-              
+              <div class="container mt-3 text-center mt-3">
+                {% if messages %}
+                  {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
               </div>
             </div>
           </div>

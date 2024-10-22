@@ -140,6 +140,11 @@ def admin_register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
+        # Verificar si la contraseña tiene al menos 8 caracteres
+        if len(password) < 8:
+            messages.error(request, 'La contraseña debe tener al menos 8 caracteres.')
+            return render(request, 'admin_register.html')
+
         # Verificar si el correo ya está registrado
         if Admin.objects.filter(email=email).exists():
             messages.error(request, 'Este correo ya está registrado como administrador.')
@@ -151,7 +156,7 @@ def admin_register(request):
             return redirect('admin_login')  # Redirigir al panel de control
 
     return render(request, 'admin_register.html')
-    
+
 # Vista para registrar un cliente
 def cliente_register(request):
     if request.method == 'POST':
@@ -159,17 +164,23 @@ def cliente_register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
+        # Verificar si la contraseña tiene al menos 8 caracteres
+        if len(password) < 8:
+            messages.error(request, 'La contraseña debe tener al menos 8 caracteres.')
+            return render(request, 'cliente_register.html')
+
         # Verificar si el correo ya está registrado
         if Cliente.objects.filter(email=email).exists():
             messages.error(request, 'Este correo ya está registrado como cliente.')
         else:
-            # Crear nuevo admin con contraseña encriptada
+            # Crear nuevo cliente con contraseña encriptada
             nuevo_cliente = Cliente(nombre=nombre, email=email, password=make_password(password))
             nuevo_cliente.save()
             request.session['cliente_id'] = nuevo_cliente.id  # Iniciar sesión automáticamente
             return redirect('cliente_login')  # Redirigir al panel de control
 
     return render(request, 'cliente_register.html')
+
 
 # Vista para el login de cliente
 def cliente_login(request):

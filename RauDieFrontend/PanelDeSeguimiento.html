@@ -32,7 +32,7 @@
   <!-- Header -->
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-      <a href="Registro.html" class="logo d-flex align-items-center">
+      <a href="{% url 'panel_seguimiento' %}" class="logo d-flex align-items-center">
         <img src="{% static 'img/nav img.png' %}" class="sitename"></img>
         <h1>RAUDIE</h1>
       </a>
@@ -42,6 +42,7 @@
           <li><a href="#dashboard" class="active">Panel de Seguimiento</a></li>
           <li><a href="#projects">Proyectos Actuales</a></li>
           <li><a href="#request">Solicitar Proyecto</a></li>
+          <li><a href="{% url 'logout' %}">Cerrar session</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -218,6 +219,7 @@
 
   <!-- Vendor JS Files -->
   <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
   <script>
     const modifyProjectModal = document.getElementById('modifyProjectModal');
     modifyProjectModal.addEventListener('show.bs.modal', function (event) {
