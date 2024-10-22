@@ -1169,18 +1169,8 @@ section,
     color: var(--accent-color);
 }
 
-    /* Custom styles for project cards */
-    .list-group-item {
-        border-radius: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      }
 /*--------------------------------------------------------------
 # Starter Section Section
---------------------------------------------------------------*/
-
-/*--------------------------------------------------------------
-# Login
 --------------------------------------------------------------*/
 .button {
     color: var(--contrast-color);
