@@ -1184,3 +1184,34 @@ section,
 .button:hover {
     background: color-mix(in srgb, #c0131e, transparent 25%);
 }
+
+/* Opcional, si deseas más personalización además de las clases de Bootstrap */
+.list-group-item-info {
+    background-color: #11cae67f;
+  }
+  
+  .list-group-item-warning {
+    background-color: #e7b21283;
+  }
+  
+  .list-group-item-success {
+    background-color: #0fe64186;
+  }
+  
+  .timeline .list-group-item {
+    margin-bottom: 15px; /* Ajusta el valor según tus necesidades */
+}
+  .btn-small {
+    padding: 0.25rem 0.5rem; /* Ajustar el padding para botones más pequeños */
+    font-size: 0.875rem; /* Tamaño de fuente más pequeño */
+    margin-right: 0.5rem; /* Margen a la derecha para separación */
+  }
+
+  .separator {
+    border: none;
+    height: 10px; /* Altura de la línea */
+    background-color: #FF00FF; /* Color fucsia */
+    margin: 2rem 0; /* Margen superior e inferior */
+  }
+  
+  

@@ -31,3 +31,21 @@ class Proyectos(models.Model):
 
     def __str__(self):
         return self.nombre
+
+#Modelo para las tares
+from django.db import models
+
+class Tarea(models.Model):
+    ESTADOS = [
+        ('Completada', 'Completada'),
+        ('En progreso', 'En progreso'),
+        ('Pendiente', 'Pendiente'),
+        ('Cancelada', 'Cancelada'),
+    ]
+
+    nombre = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='Pendiente')
+
+    def __str__(self):
+        return self.nombre

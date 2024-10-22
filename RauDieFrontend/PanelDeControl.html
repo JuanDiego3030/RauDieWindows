@@ -24,13 +24,6 @@
   <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
   <link href="{% static 'css/main.css' %}" rel="stylesheet">
 
-  <style>
-    .btn-small {
-      padding: 0.25rem 0.5rem; /* Ajustar el padding para botones más pequeños */
-      font-size: 0.875rem; /* Tamaño de fuente más pequeño */
-      margin-right: 0.5rem; /* Margen a la derecha para separación */
-    }
-  </style>
 </head>
 
 <body class="dashboard-page">
@@ -88,8 +81,9 @@
     <!-- Project Management Section -->
     <section id="projects" class="projects section">
       <div class="container">
-        <h3>Proyectos Actuales</h3>
-
+        <div class="text-center justify-content-between align-items-center mb-4">
+          <h3>Proyectos Actuales</h3>
+        </div>
         <div class="row gy-4">
           {% for proyecto in proyectos %}
             <div class="col-lg-4">
@@ -158,85 +152,106 @@
     </section>
     <!-- End Project Management Section -->
 
-    <!-- Task Management Section -->
-    <section id="tasks" class="tasks section">
-      <div class="container">
-        <h3>Tareas Recientes</h3>
-        <div class="row gy-4">
-          
-          <!-- Tarea 1 -->
-          <div class="col-lg-4">
-            <div class="card rounded shadow-sm">
-              <div class="card-body">
-                <h4 class="card-title">Tarea 1</h4>
-                <p class="card-text">Descripción de la tarea 1.</p>
-                <span class="badge bg-success mb-3">Completada</span>
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonTask1" data-bs-toggle="dropdown" aria-expanded="false">
-                    Cambiar Estatus
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask1">
-                    <li><a class="dropdown-item" href="#">Completada</a></li>
-                    <li><a class="dropdown-item" href="#">En progreso</a></li>
-                    <li><a class="dropdown-item" href="#">Pendiente</a></li>
-                    <li><a class="dropdown-item" href="#">Cancelada</a></li>
-                  </ul>
-                </div>
-              </div>
+<!-- Task Management Section -->
+<section id="tasks" class="tasks section">
+  <div class="container">
+    <div class="text-center justify-content-between align-items-center mb-4">
+      <h3>Tareas Recientes</h3>
+      <!-- Botón para abrir el modal -->
+       <br>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+        Agregar Tarea
+      </button>
+    </div>
+    <div class="row gy-4">
+      {% for tarea in tareas %}
+      <div class="col-lg-4">
+        <div class="card rounded shadow-sm">
+          <div class="card-body">
+            <h4 class="card-title">{{ tarea.nombre }}</h4>
+            <p class="card-text">{{ tarea.descripcion }}</p>
+            <span class="badge 
+              {% if tarea.estado == 'Completada' %}bg-success
+              {% elif tarea.estado == 'En progreso' %}bg-warning
+              {% elif tarea.estado == 'Pendiente' %}bg-danger
+              {% else %}bg-secondary
+              {% endif %}">
+              {{ tarea.estado }}
+            </span>
+            <div class="dropdown mt-2">
+              <button class="btn btn-secondary dropdown-toggle btn-small" type="button" id="dropdownMenuButtonTask{{ tarea.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                Cambiar Estatus
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask{{ tarea.id }}">
+                <li>
+                  <form method="POST" class="m-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="tarea_id" value="{{ tarea.id }}">
+                    <select name="estado_tarea" class="form-select">
+                      <option value="Completada">Completada</option>
+                      <option value="En progreso">En progreso</option>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="Cancelada">Cancelada</option>
+                    </select>
+                    <button class="dropdown-item" type="submit" name="cambiar_estatus_tarea">Actualizar</button>
+                  </form>
+                </li>
+              </ul>
             </div>
+            <!-- Formulario para eliminar tarea dentro de la tarjeta -->
+            <form method="POST" class="mt-3">
+              {% csrf_token %}
+              <input type="hidden" name="tarea_id" value="{{ tarea.id }}">
+              <button class="btn btn-danger btn-sm" type="submit" name="eliminar_tarea">Eliminar Tarea</button>
+            </form>
           </div>
-          <!-- Fin Tarea 1 -->
-
-          <!-- Tarea 2 -->
-          <div class="col-lg-4">
-            <div class="card rounded shadow-sm">
-              <div class="card-body">
-                <h4 class="card-title">Tarea 2</h4>
-                <p class="card-text">Descripción de la tarea 2.</p>
-                <span class="badge bg-warning mb-3">En progreso</span>
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonTask2" data-bs-toggle="dropdown" aria-expanded="false">
-                    Cambiar Estatus
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask2">
-                    <li><a class="dropdown-item" href="#">Completada</a></li>
-                    <li><a class="dropdown-item" href="#">En progreso</a></li>
-                    <li><a class="dropdown-item" href="#">Pendiente</a></li>
-                    <li><a class="dropdown-item" href="#">Cancelada</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Fin Tarea 2 -->
-
-          <!-- Tarea 3 -->
-          <div class="col-lg-4">
-            <div class="card rounded shadow-sm">
-              <div class="card-body">
-                <h4 class="card-title">Tarea 3</h4>
-                <p class="card-text">Descripción de la tarea 3.</p>
-                <span class="badge bg-danger mb-3">Pendiente</span>
-                <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonTask3" data-bs-toggle="dropdown" aria-expanded="false">
-                    Cambiar Estatus
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask3">
-                    <li><a class="dropdown-item" href="#">Completada</a></li>
-                    <li><a class="dropdown-item" href="#">En progreso</a></li>
-                    <li><a class="dropdown-item" href="#">Pendiente</a></li>
-                    <li><a class="dropdown-item" href="#">Cancelada</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Fin Tarea 3 -->
-
         </div>
       </div>
-    </section>
-    <!-- End Task Management Section -->
+      {% empty %}
+      <div class="col-lg-12">
+        <div class="alert alert-info">No hay tareas registradas en este momento.</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<!-- End Task Management Section -->
+
+<!-- Modal para agregar tarea -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTaskModalLabel">Agregar Tarea</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="nombre_tarea" class="form-label">Nombre de la tarea</label>
+            <input type="text" class="form-control" name="nombre_tarea" placeholder="Nombre de la tarea" required>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion_tarea" class="form-label">Descripción</label>
+            <input type="text" class="form-control" name="descripcion_tarea" placeholder="Descripción" required>
+          </div>
+          <div class="mb-3">
+            <label for="estado_tarea" class="form-label">Estado</label>
+            <select class="form-select" name="estado_tarea" required>
+              <option value="Pendiente">Pendiente</option>
+              <option value="En progreso">En progreso</option>
+              <option value="Completada">Completada</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" name="agregar_tarea">Agregar Tarea</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal -->
 
     <!-- Footer -->
     <footer id="footer" class="footer">

@@ -33,7 +33,7 @@
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
       <a href="{% url 'panel_seguimiento' %}" class="logo d-flex align-items-center">
-        <img src="{% static 'img/nav img.png' %}" class="sitename"></img>
+        <img src="{% static 'img/nav img.png' %}" class="sitename">
         <h1>RAUDIE</h1>
       </a>
 
@@ -42,7 +42,7 @@
           <li><a href="#dashboard" class="active">Panel de Seguimiento</a></li>
           <li><a href="#projects">Proyectos Actuales</a></li>
           <li><a href="#request">Solicitar Proyecto</a></li>
-          <li><a href="{% url 'logout' %}">Cerrar session</a></li>
+          <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -65,30 +65,49 @@
       </div>
     </section>
     <!-- End Dashboard Overview -->
+
     <!-- Project Management Section with Timeline -->
     <section id="projects" class="projects section">
       <div class="container">
         <div class="row d-flex justify-content-between align-items-center mb-4">
           <div class="col-lg-12 text-center">
-              <h3>Proyectos Actuales</h3>
+            <h3>Proyectos Actuales</h3>
           </div>
-      </div>
+        </div>
 
         <!-- Project Timeline List -->
         <ul class="timeline list-group">
           {% for proyecto in proyectos %}
-          <li class="list-group-item">
+          <li class="list-group-item 
+             {% if proyecto.estado == 'Planeando' %} list-group-item-info 
+             {% elif proyecto.estado == 'En Progreso' %} list-group-item-warning 
+             {% elif proyecto.estado == 'Completado' %} list-group-item-success 
+             {% elif proyecto.estado == 'Cancelado' %} list-group-item-danger 
+             {% endif %}">
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <h4>{{ proyecto.nombre }}</h4>
                 <p><strong>Fecha de inicio:</strong> {{ proyecto.fecha_inicio|date:"d/m/Y" }}</p>
+                
+                <!-- Estatus del proyecto con color dinámico -->
                 <h5>Estatus:</h5>
-                <ul>
-                  <li>{{ proyecto.estado }}</li>
-                </ul>
+                <span class="badge 
+                  {% if proyecto.estado == 'Completado' %}bg-success
+                  {% elif proyecto.estado == 'En progreso' %}bg-warning
+                  {% elif proyecto.estado == 'Pendiente' %}bg-danger
+                  {% else %}bg-secondary
+                  {% endif %}">
+                  {{ proyecto.estado }}
+                </span>
+                
               </div>
               <div>
-                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modifyProjectModal" data-proyecto-id="{{ proyecto.id }}" data-nombre="{{ proyecto.nombre }}" data-tipo="{{ proyecto.tipo }}" data-descripcion="{{ proyecto.descripcion }}" data-requerimientos="{{ proyecto.requerimientos }}">
+                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modifyProjectModal" 
+                  data-proyecto-id="{{ proyecto.id }}" 
+                  data-nombre="{{ proyecto.nombre }}" 
+                  data-tipo="{{ proyecto.tipo }}" 
+                  data-descripcion="{{ proyecto.descripcion }}" 
+                  data-requerimientos="{{ proyecto.requerimientos }}">
                   Solicitar Cambios
                 </button>
               </div>
@@ -100,8 +119,10 @@
           </li>
           {% endfor %}
         </ul>
+        
         <!-- End Project Timeline List -->
 
+      </div>
     </section>
     <!-- End Project Management Section -->
 
@@ -125,6 +146,60 @@
                 <input type="text" class="form-control" id="projectName" name="nombre" placeholder="Ingresa el nombre del proyecto" required>
               </div>
 
+              <!-- Tipo de Proyecto -->
+              <div class="mb-3">
+                <label for="projectType" class="form-label">Tipo de Proyecto</label>
+                <select class="form-select" id="projectType" name="tipo" required>
+                  <option selected disabled>Selecciona el tipo de proyecto</option>
+                  <option value="desarrollo-web">Desarrollo Web</option>
+                  <option value="diseno-grafico">Diseño Gráfico</option>
+                  <option value="gestion-producto">Gestión de Producto</option>
+                  <option value="marketing">Marketing</option>
+                </select>
+              </div>
+
+              <!-- Descripción del Proyecto -->
+              <div class="mb-3">
+                <label for="projectDescription" class="form-label">Descripción del Proyecto</label>
+                <textarea class="form-control" id="projectDescription" name="descripcion" rows="4" placeholder="Describe brevemente tu proyecto" required></textarea>
+              </div>
+
+              <!-- Requerimientos Principales -->
+              <div class="mb-3">
+                <label for="projectRequirements" class="form-label">Requerimientos del Proyecto</label>
+                <textarea class="form-control" id="projectRequirements" name="requerimientos" rows="4" placeholder="Especifica los requerimientos principales" required></textarea>
+              </div>
+
+              <!-- Enviar Formulario -->
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    <!-- End Project Request Form Section -->
+
+    <!-- Modal for Modify Project -->
+    <div class="modal fade" id="modifyProjectModal" tabindex="-1" aria-labelledby="modifyProjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modifyProjectModalLabel">Modificar Proyecto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="{% url 'panel_seguimiento' %}" method="POST">
+              {% csrf_token %}
+              <input type="hidden" id="modifyProjectId" name="proyecto_id" value="">
+
+              <!-- Nombre del Proyecto -->
+              <div class="mb-3">
+                <label for="modifyProjectName" class="form-label">Nombre del Proyecto</label>
+                <input type="text" class="form-control" id="modifyProjectName" name="nombre" required>
+              </div>
               <!-- Tipo de Proyecto -->
               <div class="mb-3">
                 <label for="projectType" class="form-label">Tipo de Proyecto</label>
@@ -206,7 +281,7 @@
 
               <!-- Enviar Formulario -->
               <div class="text-center">
-                <button type="submit" class="btn btn-primary">Modificar Proyecto</button>
+                <button type="submit" class="btn btn-danger">Modificar Proyecto</button>
               </div>
             </form>
           </div>

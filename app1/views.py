@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Proyectos, Cliente, Admin
+from .models import Proyectos, Cliente, Admin, Tarea
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -17,6 +17,7 @@ def control(request):
 
     proyectos = Proyectos.objects.all()  # Obtener todos los proyectos registrados
     admin = get_object_or_404(Admin, id=admin_id)  # Obtener información del admin autenticado
+    tareas = Tarea.objects.all()  # Obtener todas las tareas registradas
 
     if request.method == 'POST':
         if 'eliminar_proyecto' in request.POST:
@@ -39,8 +40,39 @@ def control(request):
             proyecto.save()
             messages.success(request, 'Estatus del proyecto actualizado.')
             return redirect('panel_control')
+        
+        if 'agregar_tarea' in request.POST:
+            nombre = request.POST.get('nombre_tarea')
+            descripcion = request.POST.get('descripcion_tarea')
+            estado = request.POST.get('estado_tarea')
 
-    return render(request, 'PanelDeControl.html', {'proyectos': proyectos, 'admin': admin})
+            nueva_tarea = Tarea(nombre=nombre, descripcion=descripcion, estado=estado)
+            nueva_tarea.save()
+            messages.success(request, 'Tarea añadida correctamente.')
+            return redirect('panel_control')
+
+        if 'eliminar_tarea' in request.POST:
+            tarea_id = request.POST.get('tarea_id')
+            tarea = get_object_or_404(Tarea, id=tarea_id)
+            tarea.delete()
+            messages.success(request, 'Tarea eliminada correctamente.')
+            return redirect('panel_control')
+
+        if 'cambiar_estatus_tarea' in request.POST:
+            tarea_id = request.POST.get('tarea_id')
+            nuevo_estatus = request.POST.get('estado_tarea')
+
+            if not nuevo_estatus:
+                messages.error(request, 'Por favor, selecciona un estado válido.')
+                return redirect('panel_control')
+
+            tarea = get_object_or_404(Tarea, id=tarea_id)
+            tarea.estado = nuevo_estatus
+            tarea.save()
+            messages.success(request, 'Estatus de la tarea actualizado.')
+            return redirect('panel_control')
+
+    return render(request, 'PanelDeControl.html', {'proyectos': proyectos, 'admin': admin, 'tareas': tareas})
 
 
 # Vista para el Panel de Seguimiento (solo accesible para clientes)
