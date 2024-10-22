@@ -183,112 +183,59 @@
     <!-- End Project Request Form Section -->
 
     <!-- Modal for Modify Project -->
-    <div class="modal fade" id="modifyProjectModal" tabindex="-1" aria-labelledby="modifyProjectModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modifyProjectModalLabel">Modificar Proyecto</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form action="{% url 'panel_seguimiento' %}" method="POST">
-              {% csrf_token %}
-              <input type="hidden" id="modifyProjectId" name="proyecto_id" value="">
-
-              <!-- Nombre del Proyecto -->
-              <div class="mb-3">
-                <label for="modifyProjectName" class="form-label">Nombre del Proyecto</label>
-                <input type="text" class="form-control" id="modifyProjectName" name="nombre" required>
-              </div>
-              <!-- Tipo de Proyecto -->
-              <div class="mb-3">
-                <label for="projectType" class="form-label">Tipo de Proyecto</label>
-                <select class="form-select" id="projectType" name="tipo" placeholder="Ingresa el nombre del proyecto" required>
-                  <option selected disabled>Selecciona el tipo de proyecto</option>
-                  <option value="desarrollo-web">Desarrollo Web</option>
-                  <option value="diseno-grafico">Diseño Gráfico</option>
-                  <option value="gestion-producto">Gestión de Producto</option>
-                  <option value="marketing">Marketing</option>
-                </select>
-              </div>
-
-              <!-- Descripción del Proyecto -->
-              <div class="mb-3">
-                <label for="projectDescription" class="form-label">Descripción del Proyecto</label>
-                <textarea class="form-control" id="projectDescription" name="descripcion" rows="4" placeholder="Describe brevemente tu proyecto" required></textarea>
-              </div>
-
-              <!-- Requerimientos Principales -->
-              <div class="mb-3">
-                <label for="projectRequirements" class="form-label">Requerimientos del Proyecto</label>
-                <textarea class="form-control" id="projectRequirements" name="requerimientos" rows="4" placeholder="Especifica los requerimientos principales" required></textarea>
-              </div>
-
-              <!-- Enviar Formulario -->
-              <div class="text-center">
-                <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
-              </div>
-            </form>
-          </div>
-        </div>
-
+<div class="modal fade" id="modifyProjectModal" tabindex="-1" aria-labelledby="modifyProjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-lg">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modifyProjectModalLabel">Modificar Proyecto</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-    </section>
-    <!-- End Project Request Form Section -->
+      <div class="modal-body">
+        <form action="{% url 'panel_seguimiento' %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" id="modifyProjectId" name="proyecto_id" value="">
 
-    <!-- Modal for Modify Project -->
-    <div class="modal fade" id="modifyProjectModal" tabindex="-1" aria-labelledby="modifyProjectModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modifyProjectModalLabel">Modificar Proyecto</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <!-- Nombre del Proyecto -->
+          <div class="mb-3">
+            <label for="modifyProjectName" class="form-label">Nombre del Proyecto</label>
+            <input type="text" class="form-control" id="modifyProjectName" name="nombre" required>
           </div>
-          <div class="modal-body">
-            <form action="{% url 'panel_seguimiento' %}" method="POST">
-              {% csrf_token %}
-              <input type="hidden" id="modifyProjectId" name="proyecto_id" value="">
 
-              <!-- Nombre del Proyecto -->
-              <div class="mb-3">
-                <label for="modifyProjectName" class="form-label">Nombre del Proyecto</label>
-                <input type="text" class="form-control" id="modifyProjectName" name="nombre" required>
-              </div>
-
-              <!-- Tipo de Proyecto -->
-              <div class="mb-3">
-                <label for="modifyProjectType" class="form-label">Tipo de Proyecto</label>
-                <select class="form-select" id="modifyProjectType" name="tipo" required>
-                  <option selected disabled>Selecciona el tipo de proyecto</option>
-                  <option value="desarrollo-web">Desarrollo Web</option>
-                  <option value="diseno-grafico">Diseño Gráfico</option>
-                  <option value="gestion-producto">Gestión de Producto</option>
-                  <option value="marketing">Marketing</option>
-                </select>
-              </div>
-
-              <!-- Descripción del Proyecto -->
-              <div class="mb-3">
-                <label for="modifyProjectDescription" class="form-label">Descripción del Proyecto</label>
-                <textarea class="form-control" id="modifyProjectDescription" name="descripcion" rows="4" required></textarea>
-              </div>
-
-              <!-- Requerimientos Principales -->
-              <div class="mb-3">
-                <label for="modifyProjectRequirements" class="form-label">Requerimientos del Proyecto</label>
-                <textarea class="form-control" id="modifyProjectRequirements" name="requerimientos" rows="4" required></textarea>
-              </div>
-
-              <!-- Enviar Formulario -->
-              <div class="text-center">
-                <button type="submit" class="btn btn-danger">Modificar Proyecto</button>
-              </div>
-            </form>
+          <!-- Tipo de Proyecto -->
+          <div class="mb-3">
+            <label for="modifyProjectType" class="form-label">Tipo de Proyecto</label>
+            <select class="form-select" id="modifyProjectType" name="tipo" required>
+              <option selected disabled>Selecciona el tipo de proyecto</option>
+              <option value="desarrollo-web">Desarrollo Web</option>
+              <option value="diseno-grafico">Diseño Gráfico</option>
+              <option value="gestion-producto">Gestión de Producto</option>
+              <option value="marketing">Marketing</option>
+            </select>
           </div>
-        </div>
+
+          <!-- Descripción del Proyecto -->
+          <div class="mb-3">
+            <label for="modifyProjectDescription" class="form-label">Descripción del Proyecto</label>
+            <textarea class="form-control" id="modifyProjectDescription" name="descripcion" rows="4" required placeholder="Describe brevemente tu proyecto"></textarea>
+          </div>
+
+          <!-- Requerimientos Principales -->
+          <div class="mb-3">
+            <label for="modifyProjectRequirements" class="form-label">Requerimientos del Proyecto</label>
+            <textarea class="form-control" id="modifyProjectRequirements" name="requerimientos" rows="4" required placeholder="Especifica los requerimientos principales"></textarea>
+          </div>
+
+          <!-- Enviar Formulario -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary rounded-pill px-4">Modificar Proyecto</button>
+          </div>
+        </form>
       </div>
     </div>
-    <!-- End Modal for Modify Project -->
+  </div>
+</div>
+<!-- End Modal for Modify Project -->
+
 
   </main>
 

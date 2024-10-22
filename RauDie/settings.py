@@ -141,3 +141,11 @@ CSRF_TRUSTED_ORIGINS = ['http://*','https://raudie-production-3d65.up.railway.ap
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Ajustes para mandar emails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Cambia esto si usas otro proveedor
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'juanxcosa@gmail.com'  # Tu correo electrónico
+EMAIL_HOST_PASSWORD = 'ykln ddza qdel qfjf'  # Tu contraseña de correo
+

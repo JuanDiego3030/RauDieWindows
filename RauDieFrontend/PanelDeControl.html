@@ -5,7 +5,6 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
   <title>Panel de Control - Gestión de Proyectos</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
@@ -17,22 +16,19 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
   <link href="{% static 'css/main.css' %}" rel="stylesheet">
-
 </head>
 
 <body class="dashboard-page">
 
   <!-- Header -->
   <header id="header" class="header d-flex align-items-center sticky-top">
-    <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-
-      <!-- Enlace al Panel de Control -->
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
       <a href="{% url 'panel_control' %}" class="logo d-flex align-items-center">
         <img src="{% static 'img/nav img.png' %}" class="sitename" alt="Logo de RauDie">
         <h1>RAUDIE</h1>
@@ -43,13 +39,13 @@
           <li><a href="#dashboard" class="active">Panel de Control</a></li>
           <li><a href="#projects">Proyectos</a></li>
           <li><a href="#tasks">Tareas</a></li>
-          <li><a href="{% url 'logout' %}">Cerrar session</a></li>
+          <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
-
     </div>
-  </header><!-- End Header -->
+  </header>
+  <!-- End Header -->
 
   <main class="main">
 
@@ -81,7 +77,7 @@
     <!-- Project Management Section -->
     <section id="projects" class="projects section">
       <div class="container">
-        <div class="text-center justify-content-between align-items-center mb-4">
+        <div class="text-center mb-4">
           <h3>Proyectos Actuales</h3>
         </div>
         <div class="row gy-4">
@@ -99,19 +95,19 @@
                   <!-- Estatus del proyecto con color dinámico -->
                   <p><strong>Estatus:</strong>
                     <span class="badge 
-                      {% if proyecto.estado == 'Completado' %}bg-success{% elif proyecto.estado == 'En progreso' %}bg-warning{% elif proyecto.estado == 'Pendiente' %}bg-danger{% else %}bg-secondary{% endif %}">
+                      {% if proyecto.estado == 'Completado' %}bg-success
+                      {% elif proyecto.estado == 'En progreso' %}bg-warning
+                      {% elif proyecto.estado == 'Pendiente' %}bg-danger
+                      {% elif proyecto.estado == 'Cancelado' %}bg-danger
+                      {% else %}bg-secondary{% endif %}">
                       {{ proyecto.estado }}
                     </span>
                   </p>
 
                   <!-- Botones para cambiar estatus y eliminar -->
                   <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary btn-small" data-bs-toggle="modal" data-bs-target="#modal-{{ proyecto.id }}">Cambiar Estado</button>
-                    <form method="POST" action="{% url 'panel_control' %}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este proyecto?');">
-                      {% csrf_token %}
-                      <input type="hidden" name="proyecto_id" value="{{ proyecto.id }}">
-                      <button class="btn btn-danger btn-small" type="submit" name="eliminar_proyecto">Eliminar</button>
-                    </form>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-{{ proyecto.id }}">Cambiar Estado</button>
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-delete-{{ proyecto.id }}">Eliminar</button>
                   </div>
                 </div>
               </div>
@@ -119,23 +115,51 @@
 
             <!-- Modal para cambiar estatus -->
             <div class="modal fade" id="modal-{{ proyecto.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ proyecto.id }}" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
+              <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-4 shadow-lg">
+                  <div class="modal-header bg-warning text-white">
                     <h5 class="modal-title" id="modalLabel-{{ proyecto.id }}">Cambiar Estado del Proyecto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                   </div>
-                  <div class="modal-body">
+                  <div class="modal-body p-4">
                     <form method="POST" action="{% url 'panel_control' %}">
                       {% csrf_token %}
                       <input type="hidden" name="proyecto_id" value="{{ proyecto.id }}">
-                      <label for="estado">Estado del proyecto:</label>
-                      <select name="estado" id="estado" required>
+                      <div class="mb-3">
+                        <label for="estado" class="form-label fw-bold">Estado del proyecto:</label>
+                        <select class="form-select rounded-pill" name="estado" id="estado" required>
                           <option value="Planeando" {% if proyecto.estado == "Planeando" %}selected{% endif %}>Planeando</option>
                           <option value="En progreso" {% if proyecto.estado == "En progreso" %}selected{% endif %}>En progreso</option>
                           <option value="Completado" {% if proyecto.estado == "Completado" %}selected{% endif %}>Completado</option>
-                      </select>
-                      <button type="submit" name="cambiar_estatus" class="btn btn-secondary mt-2">Actualizar Estatus</button>
+                          <option value="Cancelado" {% if proyecto.estado == "Cancelado" %}selected{% endif %}>Cancelado</option>
+                        </select>
+                      </div>
+                      <div class="text-end">
+                        <button type="submit" name="cambiar_estatus" class="btn btn-success rounded-pill px-4">Actualizar Estatus</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modal para confirmar la eliminación del proyecto -->
+            <div class="modal fade" id="modal-delete-{{ proyecto.id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ proyecto.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 shadow-lg">
+                  <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel-{{ proyecto.id }}">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el proyecto <strong>{{ proyecto.nombre }}</strong>? Esta acción no se puede deshacer.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form method="POST" action="{% url 'panel_control' %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="proyecto_id" value="{{ proyecto.id }}">
+                      <button type="submit" name="eliminar_proyecto" class="btn btn-danger">Eliminar</button>
                     </form>
                   </div>
                 </div>
@@ -151,7 +175,6 @@
       </div>
     </section>
     <!-- End Project Management Section -->
-
 <!-- Task Management Section -->
 <section id="tasks" class="tasks section">
   <div class="container">
@@ -184,7 +207,7 @@
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonTask{{ tarea.id }}">
                 <li>
-                  <form method="POST" class="m-0">
+                  <form method="POST" class="m-0" action="{% url 'panel_control' %}">
                     {% csrf_token %}
                     <input type="hidden" name="tarea_id" value="{{ tarea.id }}">
                     <select name="estado_tarea" class="form-select">
@@ -199,7 +222,7 @@
               </ul>
             </div>
             <!-- Formulario para eliminar tarea dentro de la tarjeta -->
-            <form method="POST" class="mt-3">
+            <form method="POST"  class="mt-3" action="{% url 'panel_control' %}">
               {% csrf_token %}
               <input type="hidden" name="tarea_id" value="{{ tarea.id }}">
               <button class="btn btn-danger btn-sm" type="submit" name="eliminar_tarea">Eliminar Tarea</button>
@@ -219,11 +242,11 @@
 
 <!-- Modal para agregar tarea -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow-lg">
+      <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="addTaskModalLabel">Agregar Tarea</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form method="POST">
@@ -245,13 +268,16 @@
               <option value="Cancelada">Cancelada</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary" name="agregar_tarea">Agregar Tarea</button>
+          <div class="text-center">
+            <button type="submit" class="btn btn-success rounded-pill px-4" name="agregar_tarea">Agregar Tarea</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
 <!-- End Modal -->
+
 
     <!-- Footer -->
     <footer id="footer" class="footer">

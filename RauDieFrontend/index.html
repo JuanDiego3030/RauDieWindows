@@ -182,24 +182,35 @@
             </div>
           </div>
           <div class="col-lg-8">
-            <form action="" method="post" class="php-email-form">
+            <form action="{% url 'index' %}" method="POST" class="php-email-form">
+              {% csrf_token %}
               <div class="row gy-4">
                 <div class="col-md-6">
-                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+                  <input type="text" name="name" class="form-control" placeholder="Tu nombre" required="">
                 </div>
                 <div class="col-md-6">
-                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+                  <input type="email" class="form-control" name="email" placeholder="Tu correo aquí" required="">
                 </div>
                 <div class="col-md-12">
-                  <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+                  <input type="text" class="form-control" name="subject" placeholder="Asunto" required="">
                 </div>
                 <div class="col-md-12">
-                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+                  <textarea class="form-control" name="message" rows="6" placeholder="Mensaje" required=""></textarea>
                 </div>
                 <div class="col-md-12 text-center">
-                  <button type="submit">Send Message</button>
+                  <button type="submit" class="bg-danger">Enviar</button>
                 </div>
               </div>
+            </form>
+            
+            {% if messages %}
+              <div class="alert alert-info">
+                {% for message in messages %}
+                  {{ message }}<br>
+                {% endfor %}
+              </div>
+            {% endif %}
+            
             </form>
           </div>
         </div>
