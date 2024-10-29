@@ -65,66 +65,127 @@
       </div>
     </section>
     <!-- End Dashboard Overview -->
-
-    <!-- Project Management Section with Timeline -->
-    <section id="projects" class="projects section">
-      <div class="container">
-        <div class="row d-flex justify-content-between align-items-center mb-4">
-          <div class="col-lg-12 text-center">
-            <h3>Proyectos Actuales</h3>
+    
+    <!-- Mostrar Mensajes de Django -->
+    <div class="container mt-3">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
           </div>
-        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
 
-        <!-- Project Timeline List -->
-        <ul class="timeline list-group">
-          {% for proyecto in proyectos %}
-          <li class="list-group-item 
-             {% if proyecto.estado == 'Planeando' %} list-group-item-info 
-             {% elif proyecto.estado == 'En Progreso' %} list-group-item-warning 
-             {% elif proyecto.estado == 'Completado' %} list-group-item-success 
-             {% elif proyecto.estado == 'Cancelado' %} list-group-item-danger 
-             {% endif %}">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h4>{{ proyecto.nombre }}</h4>
-                <p><strong>Fecha de inicio:</strong> {{ proyecto.fecha_inicio|date:"d/m/Y" }}</p>
-                
-                <!-- Estatus del proyecto con color dinámico -->
-                <h5>Estatus:</h5>
-                <span class="badge 
-                  {% if proyecto.estado == 'Completado' %}bg-success
-                  {% elif proyecto.estado == 'En progreso' %}bg-warning
-                  {% elif proyecto.estado == 'Pendiente' %}bg-danger
-                  {% else %}bg-secondary
-                  {% endif %}">
-                  {{ proyecto.estado }}
-                </span>
-                
-              </div>
-              <div>
-                <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modifyProjectModal" 
-                  data-proyecto-id="{{ proyecto.id }}" 
-                  data-nombre="{{ proyecto.nombre }}" 
-                  data-tipo="{{ proyecto.tipo }}" 
-                  data-descripcion="{{ proyecto.descripcion }}" 
-                  data-requerimientos="{{ proyecto.requerimientos }}">
-                  Solicitar Cambios
-                </button>
+<!-- Project Management Section with Timeline -->
+<section id="projects" class="projects section">
+  <div class="container">
+    <div class="row d-flex justify-content-between align-items-center mb-4">
+      <div class="col-lg-12 text-center">
+        <h3>Proyectos Actuales</h3>
+      </div>
+    </div>
+
+    <!-- Project Timeline List -->
+    <ul class="timeline list-group">
+      {% for proyecto in proyectos %}
+      <li class="list-group-item 
+         {% if proyecto.estado == 'Planeando' %} list-group-item-info 
+         {% elif proyecto.estado == 'En Progreso' %} list-group-item-warning 
+         {% elif proyecto.estado == 'Completado' %} list-group-item-success 
+         {% elif proyecto.estado == 'Cancelado' %} list-group-item-danger 
+         {% endif %}">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4>{{ proyecto.nombre }}</h4>
+            <p><strong>Fecha de inicio:</strong> {{ proyecto.fecha_inicio|date:"d/m/Y" }}</p>
+            
+            <!-- Estatus del proyecto con color dinámico -->
+            <h5>Estatus:</h5>
+            <span class="badge 
+              {% if proyecto.estado == 'Completado' %}bg-success
+              {% elif proyecto.estado == 'En Progreso' %}bg-warning
+              {% elif proyecto.estado == 'Pendiente' %}bg-danger
+              {% else %}bg-secondary
+              {% endif %}">
+              {{ proyecto.estado }}
+            </span>
+            
+            <!-- Comentarios del Proyecto -->
+            <div class="mt-12">
+              <h5>Comentarios</h5>
+              <ul class="list-group mb-12">
+                {% for comentario in proyecto.comentarios.all %}
+                  <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                      <p><strong>{{ comentario.autor }}:</strong> {{ comentario.contenido }}</p>
+                      <small class="text-muted">Publicado el {{ comentario.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <form action="{% url 'panel_seguimiento' %}" method="POST" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="comentario_id" value="{{ comentario.id }}">
+                      <br>
+                      <button type="submit" name="eliminar_comentario" class="btn btn-danger btn-sm">X</button>
+                    </form>
+                    <!-- Botón para eliminar el comentario -->
+                  </li>
+                {% empty %}
+                  <li class="list-group-item">No hay comentarios.</li>
+                {% endfor %}
+              </ul>
+            </div>  
+            <!-- Modal para agregar comentario -->
+            <div class="modal fade" id="addCommentModal{{ proyecto.id }}" tabindex="-1" aria-labelledby="addCommentModalLabel{{ proyecto.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addCommentModalLabel{{ proyecto.id }}">Agregar Comentario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form action="{% url 'panel_seguimiento' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                      <input type="hidden" name="proyecto_id" value="{{ proyecto.id }}">
+                      <div class="mb-3">
+                        <label for="comentario" class="form-label">Comentario</label>
+                        <textarea class="form-control" id="comentario" name="comentario" rows="4" required></textarea>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                      <button type="submit" class="btn btn-primary">Enviar Comentario</button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
-          </li>
-          {% empty %}
-          <li class="list-group-item">
-            <p>No tienes proyectos en este momento.</p>
-          </li>
-          {% endfor %}
-        </ul>
-        
-        <!-- End Project Timeline List -->
+          </div>
+          <div>
+            <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modifyProjectModal" 
+              data-proyecto-id="{{ proyecto.id }}" 
+              data-nombre="{{ proyecto.nombre }}" 
+              data-tipo="{{ proyecto.tipo }}" 
+              data-descripcion="{{ proyecto.descripcion }}" 
+              data-requerimientos="{{ proyecto.requerimientos }}">
+              Solicitar Cambios
+            </button>
+            <br>
+            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addCommentModal{{ proyecto.id }}">Agregar Comentario</button>
+          </div>
+        </div>
+      </li>
+      {% empty %}
+      <li class="list-group-item">
+        <p>No tienes proyectos en este momento.</p>
+      </li>
+      {% endfor %}
+    </ul>
+    <!-- End Project Timeline List -->
+  </div>
+</section>
+<!-- End Project Management Section -->
 
-      </div>
-    </section>
-    <!-- End Project Management Section -->
 
     <!-- Project Request Form Section -->
     <section id="request" class="request section">
@@ -269,23 +330,6 @@
     });
 
       // Validar el formulario antes de enviar
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
-
-    form.addEventListener('submit', function(event) {
-      const projectName = document.getElementById('projectName').value.trim();
-      const projectType = document.getElementById('projectType').value;
-      const projectDescription = document.getElementById('projectDescription').value.trim();
-      const projectRequirements = document.getElementById('projectRequirements').value.trim();
-
-      // Verificar si algún campo está vacío
-      if (!projectName || projectType === "Selecciona el tipo de proyecto" || !projectDescription || !projectRequirements) {
-        alert("Por favor, completa todos los campos antes de enviar.");
-        event.preventDefault(); // Evitar el envío del formulario
-      }
-    });
-  });
-
   </script>
 </body>
 

@@ -64,11 +64,10 @@ class Comentario(models.Model):
     contenido = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     proyecto = models.ForeignKey(Proyectos, on_delete=models.CASCADE, related_name="comentarios", null=True, blank=True)
-    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name="comentarios", null=True, blank=True)
-    autor = models.CharField(max_length=100)
+    autor = models.CharField(max_length=100)  # Agregar campo autor
 
     def __str__(self):
-        return f"Comentario de {self.autor}"
+        return f"Comentario de {self.autor} sobre {self.proyecto.nombre}"
 
 # Nueva tabla para Documentos asociados a proyectos o tareas
 class Documento(models.Model):

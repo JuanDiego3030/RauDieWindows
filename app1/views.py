@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Proyectos, Cliente, Admin, Tarea
+from .models import Proyectos, Cliente, Admin, Tarea, Etapa, Comentario
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import send_mail
@@ -35,10 +35,6 @@ def index(request):
 
 
 # Vista para el Panel de Control (solo accesible para admins)
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import Proyectos, Admin, Tarea, Etapa
-
 def control(request):
     admin_id = request.session.get('admin_id')
     if not admin_id:
@@ -136,54 +132,76 @@ def seguimiento(request):
     if not cliente_id:
         return redirect('cliente_login')  # Redirige al login si no está autenticado
 
-    cliente = get_object_or_404(Cliente, id=cliente_id)  # Obtener información del cliente autenticado
-    proyectos = Proyectos.objects.filter(cliente=cliente)  # Filtrar proyectos del cliente
-    
-    # Contexto inicial con nombre del cliente
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+    proyectos = Proyectos.objects.filter(cliente=cliente)
+
+    # Añadir comentarios en el contexto
+    comentarios_por_proyecto = {proyecto.id: proyecto.comentarios.all() for proyecto in proyectos}
+
     context = {
         'cliente': cliente,
         'proyectos': proyectos,
-        'nombre_cliente': cliente.nombre,  # Asumiendo que el modelo Cliente tiene un campo nombre
+        'comentarios_por_proyecto': comentarios_por_proyecto,
+        'nombre_cliente': cliente.nombre,
     }
 
     if request.method == 'POST':
         proyecto_id = request.POST.get('proyecto_id')
 
-        # Si el proyecto ya existe, actualízalo
-        if proyecto_id:
-            proyecto = get_object_or_404(Proyectos, id=proyecto_id)
-            proyecto.tipo = request.POST.get('tipo', proyecto.tipo)
-            proyecto.requerimientos = request.POST.get('requerimientos', proyecto.requerimientos)
-            proyecto.descripcion = request.POST.get('descripcion', proyecto.descripcion)
-            proyecto.estado = request.POST.get('estado', proyecto.estado)
-            proyecto.fecha_inicio = request.POST.get('fecha_inicio', proyecto.fecha_inicio)
-            proyecto.save()
-            messages.success(request, 'Proyecto actualizado con éxito')
+        if 'comentario' in request.POST:
+            # Manejo de adición de comentario
+            contenido_comentario = request.POST.get('comentario')
+            if proyecto_id:
+                proyecto = get_object_or_404(Proyectos, id=proyecto_id)
+                comentario = Comentario.objects.create(
+                    contenido=contenido_comentario,
+                    proyecto=proyecto,
+                    autor=cliente.nombre  # Asigna el nombre del cliente como autor
+                )
+                messages.success(request, 'Comentario agregado con éxito')
+            else:
+                messages.error(request, 'Por favor, selecciona un proyecto para comentar')
 
-        # Si no hay proyecto_id, crea un nuevo proyecto
+        elif 'eliminar_comentario' in request.POST:
+            # Manejo de eliminación de comentario
+            comentario_id = request.POST.get('comentario_id')
+            comentario = get_object_or_404(Comentario, id=comentario_id)
+            comentario.delete()
+            messages.success(request, 'Comentario eliminado con éxito')
+
         else:
-            nombre = request.POST.get('nombre')  # Obtener el nombre del proyecto
-            tipo = request.POST.get('tipo')
-            requerimientos = request.POST.get('requerimientos')
-            descripcion = request.POST.get('descripcion')
-            estado = request.POST.get('estado', 'Planeando')  # Establecer estado por defecto
-            fecha_inicio = request.POST.get('fecha_inicio', timezone.now())  # Usa la fecha actual si no se proporciona
+            # Lógica para actualizar o crear proyectos
+            if proyecto_id:
+                proyecto = get_object_or_404(Proyectos, id=proyecto_id)
+                proyecto.tipo = request.POST.get('tipo', proyecto.tipo)
+                proyecto.requerimientos = request.POST.get('requerimientos', proyecto.requerimientos)
+                proyecto.descripcion = request.POST.get('descripcion', proyecto.descripcion)
+                proyecto.estado = request.POST.get('estado', proyecto.estado)
+                proyecto.fecha_inicio = request.POST.get('fecha_inicio', proyecto.fecha_inicio)
+                proyecto.save()
+                messages.success(request, 'Proyecto actualizado con éxito')
+            else:
+                nombre = request.POST.get('nombre')
+                tipo = request.POST.get('tipo')
+                requerimientos = request.POST.get('requerimientos')
+                descripcion = request.POST.get('descripcion')
+                estado = request.POST.get('estado', 'Planeando')
+                fecha_inicio = request.POST.get('fecha_inicio', timezone.now())
 
-            nuevo_proyecto = Proyectos(
-                cliente=cliente,
-                nombre=nombre,  # Asignar el nombre del proyecto
-                tipo=tipo,
-                requerimientos=requerimientos,
-                descripcion=descripcion,
-                estado=estado,
-                fecha_inicio=fecha_inicio,
-            )
-            nuevo_proyecto.save()
-            messages.success(request, 'Proyecto creado con éxito')
+                nuevo_proyecto = Proyectos.objects.create(
+                    cliente=cliente,
+                    nombre=nombre,
+                    tipo=tipo,
+                    requerimientos=requerimientos,
+                    descripcion=descripcion,
+                    estado=estado,
+                    fecha_inicio=fecha_inicio,
+                )
+                messages.success(request, 'Proyecto creado con éxito')
 
         return redirect('panel_seguimiento')  # Redirige al panel de seguimiento
 
-    return render(request, 'PanelDeSeguimiento.html', context)  # Renderiza con el contexto actualizado
+    return render(request, 'PanelDeSeguimiento.html', context)
 
 # Función personalizada para autenticar usuarios (admin y cliente)
 def custom_authenticate(email, password, user_type):
