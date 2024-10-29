@@ -33,8 +33,6 @@ class Proyectos(models.Model):
         return self.nombre
 
 #Modelo para las tares
-from django.db import models
-
 class Tarea(models.Model):
     ESTADOS = [
         ('Completada', 'Completada'),
@@ -49,3 +47,46 @@ class Tarea(models.Model):
 
     def __str__(self):
         return self.nombre
+
+# Nueva tabla para Etapa en proyectos o tareas
+class Etapa(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    fecha_inicio = models.DateField(default=timezone.now)
+    fecha_fin = models.DateField(null=True, blank=True)
+    proyecto = models.ForeignKey(Proyectos, on_delete=models.CASCADE, related_name="etapas")
+
+    def __str__(self):
+        return f"{self.nombre} - {self.proyecto.nombre}"
+
+# Nueva tabla para Comentarios en proyectos o tareas
+class Comentario(models.Model):
+    contenido = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    proyecto = models.ForeignKey(Proyectos, on_delete=models.CASCADE, related_name="comentarios", null=True, blank=True)
+    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name="comentarios", null=True, blank=True)
+    autor = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Comentario de {self.autor}"
+
+# Nueva tabla para Documentos asociados a proyectos o tareas
+class Documento(models.Model):
+    titulo = models.CharField(max_length=200)
+    archivo = models.FileField(upload_to='documentos/')
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+    proyecto = models.ForeignKey(Proyectos, on_delete=models.CASCADE, related_name="documentos", null=True, blank=True)
+    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name="documentos", null=True, blank=True)
+
+    def __str__(self):
+        return self.titulo
+
+# Nueva tabla para Asignaciones de tareas a clientes o admins
+class Asignacion(models.Model):
+    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name="asignaciones")
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
+    admin = models.ForeignKey(Admin, on_delete=models.SET_NULL, null=True, blank=True)
+    fecha_asignacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Asignación de {self.tarea.nombre}"

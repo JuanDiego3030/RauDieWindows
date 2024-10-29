@@ -241,6 +241,129 @@
 </section>
 <!-- End Task Management Section -->
 
+<!-- Section for Stage Management -->
+<section id="stages" class="stages section">
+  <div class="container">
+    <div class="text-center justify-content-between align-items-center mb-4">
+      <h3>Etapas Recientes</h3>
+      <br>
+      <!-- Button to open the modal for adding a new stage -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStageModal">
+        Agregar Etapa
+      </button>
+    </div>
+
+    <div class="row gy-4">
+      {% for etapa in etapas %}
+      <div class="col-lg-4">
+        <div class="card rounded shadow-sm">
+          <div class="card-body">
+            <h4 class="card-title">{{ etapa.nombre }} <small>({{ etapa.proyecto.nombre }})</small></h4>
+            <p class="card-text">{{ etapa.descripcion }}</p>
+            <p class="card-text"><strong>Fecha de Inicio:</strong> {{ etapa.fecha_inicio }}</p>
+            <p class="card-text"><strong>Fecha de Fin:</strong> {{ etapa.fecha_fin|default:"No especificada" }}</p>
+            <span class="badge 
+              {% if etapa.estado == 'Completada' %}bg-success
+              {% elif etapa.estado == 'En progreso' %}bg-warning
+              {% elif etapa.estado == 'Pendiente' %}bg-danger
+              {% else %}bg-secondary
+              {% endif %}">
+              {{ etapa.estado }}
+            </span>
+
+            <!-- Button to open the modal for updating the stage -->
+            <button type="button" class="btn btn-info btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#editStageModal{{ etapa.id }}">
+              Modificar
+            </button>
+
+            <!-- Formulario para eliminar etapa -->
+            <form method="POST" class="mt-3" action="{% url 'panel_control' %}">
+              {% csrf_token %}
+              <input type="hidden" name="etapa_id" value="{{ etapa.id }}">
+              <button class="btn btn-danger btn-sm" type="submit" name="eliminar_etapa">Eliminar Etapa</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal for Editing Stage -->
+      <div class="modal fade" id="editStageModal{{ etapa.id }}" tabindex="-1" aria-labelledby="editStageModalLabel{{ etapa.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editStageModalLabel{{ etapa.id }}">Modificar Etapa</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form method="post" action="{% url 'panel_control' %}">
+                {% csrf_token %}
+                <input type="hidden" name="etapa_id" value="{{ etapa.id }}">
+                <div class="mb-3">
+                  <label for="nombre_etapa" class="form-label">Nombre de la Etapa</label>
+                  <input type="text" name="nombre_etapa" class="form-control" id="nombre_etapa" value="{{ etapa.nombre }}" required>
+                </div>
+                <div class="mb-3">
+                  <label for="descripcion_etapa" class="form-label">Descripción</label>
+                  <textarea name="descripcion_etapa" class="form-control" id="descripcion_etapa" required>{{ etapa.descripcion }}</textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                  <input type="date" name="fecha_inicio" class="form-control" id="fecha_inicio" value="{{ etapa.fecha_inicio|date:'Y-m-d' }}">
+                </div>
+                <div class="mb-3">
+                  <label for="fecha_fin" class="form-label">Fecha de Fin</label>
+                  <input type="date" name="fecha_fin" class="form-control" id="fecha_fin" value="{{ etapa.fecha_fin|date:'Y-m-d' }}">
+                </div>
+                <button type="submit" name="actualizar_etapa" class="btn btn-primary">Actualizar Etapa</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% empty %}
+      <div class="col-lg-12">
+        <div class="alert alert-info">No hay etapas registradas en este momento.</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Modal for Adding Stage -->
+<div class="modal fade" id="addStageModal" tabindex="-1" aria-labelledby="addStageModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addStageModalLabel">Agregar Nueva Etapa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'panel_control' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="nombre_etapa" class="form-label">Nombre de la Etapa</label>
+            <input type="text" name="nombre_etapa" class="form-control" id="nombre_etapa" required>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion_etapa" class="form-label">Descripción</label>
+            <textarea name="descripcion_etapa" class="form-control" id="descripcion_etapa" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="proyecto_id" class="form-label">Seleccionar Proyecto</label>
+            <select name="proyecto_id" class="form-select" id="proyecto_id" required>
+              {% for proyecto in proyectos %}
+                <option value="{{ proyecto.id }}">{{ proyecto.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" name="agregar_etapa" class="btn btn-primary">Agregar Etapa</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal para agregar tarea -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">

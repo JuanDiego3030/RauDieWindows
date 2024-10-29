@@ -35,6 +35,10 @@ def index(request):
 
 
 # Vista para el Panel de Control (solo accesible para admins)
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import Proyectos, Admin, Tarea, Etapa
+
 def control(request):
     admin_id = request.session.get('admin_id')
     if not admin_id:
@@ -43,8 +47,10 @@ def control(request):
     proyectos = Proyectos.objects.all()  # Obtener todos los proyectos registrados
     admin = get_object_or_404(Admin, id=admin_id)  # Obtener información del admin autenticado
     tareas = Tarea.objects.all()  # Obtener todas las tareas registradas
+    etapas = Etapa.objects.all()  # Obtener todas las etapas registradas
 
     if request.method == 'POST':
+        # Lógica para eliminar y actualizar proyectos y tareas
         if 'eliminar_proyecto' in request.POST:
             proyecto_id = request.POST.get('proyecto_id')
             proyecto = get_object_or_404(Proyectos, id=proyecto_id)
@@ -55,11 +61,6 @@ def control(request):
         if 'cambiar_estatus' in request.POST:
             proyecto_id = request.POST.get('proyecto_id')
             nuevo_estatus = request.POST.get('estado')
-
-            if not nuevo_estatus:  # Verificar que el nuevo estado no esté vacío
-                messages.error(request, 'Por favor, selecciona un estado válido.')
-                return redirect('panel_control')
-
             proyecto = get_object_or_404(Proyectos, id=proyecto_id)
             proyecto.estado = nuevo_estatus
             proyecto.save()
@@ -70,7 +71,6 @@ def control(request):
             nombre = request.POST.get('nombre_tarea')
             descripcion = request.POST.get('descripcion_tarea')
             estado = request.POST.get('estado_tarea')
-
             nueva_tarea = Tarea(nombre=nombre, descripcion=descripcion, estado=estado)
             nueva_tarea.save()
             messages.success(request, 'Tarea añadida correctamente.')
@@ -83,21 +83,51 @@ def control(request):
             messages.success(request, 'Tarea eliminada correctamente.')
             return redirect('panel_control')
 
-        if 'cambiar_estatus_tarea' in request.POST:
-            tarea_id = request.POST.get('tarea_id')
-            nuevo_estatus = request.POST.get('estado_tarea')
-
-            if not nuevo_estatus:
-                messages.error(request, 'Por favor, selecciona un estado válido.')
-                return redirect('panel_control')
-
-            tarea = get_object_or_404(Tarea, id=tarea_id)
-            tarea.estado = nuevo_estatus
-            tarea.save()
-            messages.success(request, 'Estatus de la tarea actualizado.')
+        # Nueva lógica para agregar, actualizar y eliminar etapas
+        if 'agregar_etapa' in request.POST:
+            nombre = request.POST.get('nombre_etapa')
+            descripcion = request.POST.get('descripcion_etapa')
+            proyecto_id = request.POST.get('proyecto_id')
+            proyecto = get_object_or_404(Proyectos, id=proyecto_id)
+            nueva_etapa = Etapa(nombre=nombre, descripcion=descripcion, proyecto=proyecto)
+            nueva_etapa.save()
+            messages.success(request, 'Etapa añadida correctamente.')
             return redirect('panel_control')
 
-    return render(request, 'PanelDeControl.html', {'proyectos': proyectos, 'admin': admin, 'tareas': tareas})
+        if 'eliminar_etapa' in request.POST:
+            etapa_id = request.POST.get('etapa_id')
+            etapa = get_object_or_404(Etapa, id=etapa_id)
+            etapa.delete()
+            messages.success(request, 'Etapa eliminada correctamente.')
+            return redirect('panel_control')
+
+        if 'actualizar_etapa' in request.POST:
+            etapa_id = request.POST.get('etapa_id')
+            nombre = request.POST.get('nombre_etapa')
+            descripcion = request.POST.get('descripcion_etapa')
+            fecha_inicio = request.POST.get('fecha_inicio')
+            fecha_fin = request.POST.get('fecha_fin')
+            
+            # Validaciones de campos
+            if not nombre or not descripcion:
+                messages.error(request, 'El nombre y la descripción son obligatorios.')
+                return redirect('panel_control')
+            if fecha_inicio and fecha_fin and fecha_inicio > fecha_fin:
+                messages.error(request, 'La fecha de inicio no puede ser posterior a la fecha de fin.')
+                return redirect('panel_control')
+            
+            # Actualización de la etapa
+            etapa = get_object_or_404(Etapa, id=etapa_id)
+            etapa.nombre = nombre
+            etapa.descripcion = descripcion
+            etapa.fecha_inicio = fecha_inicio or etapa.fecha_inicio
+            etapa.fecha_fin = fecha_fin
+            etapa.save()
+            messages.success(request, 'Etapa actualizada correctamente.')
+            return redirect('panel_control')
+
+    return render(request, 'PanelDeControl.html', {'proyectos': proyectos, 'admin': admin, 'tareas': tareas, 'etapas': etapas})
+
 
 
 # Vista para el Panel de Seguimiento (solo accesible para clientes)
