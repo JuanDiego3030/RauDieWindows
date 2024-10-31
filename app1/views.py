@@ -76,6 +76,16 @@ def control(request):
             tarea.delete()
             messages.success(request, 'Tarea eliminada correctamente.')
             return redirect('panel_control')
+        
+        
+        if 'cambiar_estatus_tarea' in request.POST:
+            tarea_id = request.POST.get('tarea_id')
+            nuevo_estado = request.POST.get('estado_tarea')
+            tarea = get_object_or_404(Tarea, id=tarea_id)
+            tarea.estado = nuevo_estado
+            tarea.save()
+            messages.success(request, f'Estatus de la tarea actualizado a "{nuevo_estado}".')
+            return redirect('panel_control')
 
         # Nueva lógica para agregar, actualizar y eliminar etapas
         if 'agregar_etapa' in request.POST:
@@ -290,7 +300,6 @@ def cliente_register(request):
         
     return render(request, 'cliente_register.html')
 
-
 # Vista para el login de cliente
 def cliente_login(request):
     if request.method == 'POST':
@@ -315,6 +324,9 @@ def cliente_login(request):
 
 # Vista para gestionar usuarios
 def gestionar_usuarios(request):
+    admin_id = request.session.get('admin_id')
+    if not admin_id:
+        return redirect('gestion_login')  # Redirige al login si no está autenticado
 
     # Obtén todos los clientes y administradores
     clientes = Cliente.objects.all()
@@ -424,10 +436,6 @@ def gestion_login(request):
 
         try:
             admin = Admin_user.objects.get(email=email)
-
-            if not admin.activo:
-                messages.error(request, 'Este usuario está bloqueado.')
-                return render(request, 'gestion_login.html')
 
             # Verificar la contraseña
             if check_password(password, admin.password):  # Comprobar si la contraseña es correcta

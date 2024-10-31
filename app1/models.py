@@ -74,11 +74,10 @@ class Admin_user(models.Model):
     nombre = models.CharField(max_length=100)  # Nombre del usuario admin
     email = models.EmailField(max_length=255, unique=True)  # Correo del usuario admin
     password = models.CharField(max_length=255)  # Contraseña del usuario admin
-    fecha_registro = models.DateTimeField(auto_now_add=True)  # Fecha de registro del usuario
-    activo = models.BooleanField(default=True)  # Estado activo o inactivo del usuario admin
+ # Estado activo o inactivo del usuario admin
 
     def __str__(self):
-        return f"Admin User: {self.nombre} (Activo: {'Sí' if self.activo else 'No'})"
+        return f"Admin User: {self.nombre}"
 
 # Modelo para bloquear usuarios (Clientes y Admins)
 class User_block(models.Model):
@@ -89,3 +88,4 @@ class User_block(models.Model):
     def __str__(self):
         tipo_usuario = "Cliente" if self.es_cliente else "Admin"
         return f"{tipo_usuario} bloqueado ID: {self.usuario_id}"
+
