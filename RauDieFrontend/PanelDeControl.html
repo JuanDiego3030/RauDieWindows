@@ -40,6 +40,7 @@
           <li><a href="#projects">Proyectos</a></li>
           <li><a href="#tasks">Tareas</a></li>
           <li><a href="{% url 'admin_register'%}">Regístrar nuevo admin</a></li>
+          <li><a href="{% url 'gestion_login'%}">Gestion de usuarios</a></li>
           <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -104,6 +105,22 @@
                       {{ proyecto.estado }}
                     </span>
                   </p>
+                  <div class="mt-12">
+                    <h5>Comentarios</h5>
+                    <ul class="list-group mb-12">
+                      {% for comentario in proyecto.comentarios.all %}
+                        <li class="list-group-item d-flex justify-content-between">
+                          <div>
+                            <p><strong>{{ comentario.autor }}:</strong> {{ comentario.contenido }}</p>
+                            <small class="text-muted">Publicado el {{ comentario.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                          </div>
+                          <!-- Botón para eliminar el comentario -->
+                        </li>
+                      {% empty %}
+                        <li class="list-group-item">No hay comentarios.</li>
+                      {% endfor %}
+                    </ul>
+                  </div>  
 
                   <!-- Botones para cambiar estatus y eliminar -->
                   <div class="d-flex justify-content-between">
@@ -246,7 +263,6 @@
   <div class="container">
     <div class="text-center justify-content-between align-items-center mb-4">
       <h3>Etapas Recientes</h3>
-      <br>
       <!-- Button to open the modal for adding a new stage -->
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStageModal">
         Agregar Etapa
@@ -262,15 +278,6 @@
             <p class="card-text">{{ etapa.descripcion }}</p>
             <p class="card-text"><strong>Fecha de Inicio:</strong> {{ etapa.fecha_inicio }}</p>
             <p class="card-text"><strong>Fecha de Fin:</strong> {{ etapa.fecha_fin|default:"No especificada" }}</p>
-            <span class="badge 
-              {% if etapa.estado == 'Completada' %}bg-success
-              {% elif etapa.estado == 'En progreso' %}bg-warning
-              {% elif etapa.estado == 'Pendiente' %}bg-danger
-              {% else %}bg-secondary
-              {% endif %}">
-              {{ etapa.estado }}
-            </span>
-
             <!-- Button to open the modal for updating the stage -->
             <button type="button" class="btn btn-info btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#editStageModal{{ etapa.id }}">
               Modificar

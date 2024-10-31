@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Panel de Control - Gestión de Usuarios</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+  
+    <!-- Favicons -->
+    <link href="{% static 'img/favicon.png' %}" rel="icon">
+    <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+  </head>
+
+<body class="index-page">
+
+    
+  <!-- Header -->
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+      <a href="{% url 'panel_control' %}" class="logo d-flex align-items-center">
+        <img src="{% static 'img/nav img.png' %}" class="sitename" alt="Logo de RauDie">
+        <h1>RAUDIE</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+    </div>
+  </header>
+
+
+    <main class="container mt-5">
+        <h2 class="text-center">Gestión de Usuarios</h2>
+
+        <!-- Mostrar Mensajes de Django -->
+        <div class="container mt-3">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Clientes Section -->
+        <section>
+            <h3 class="my-4">Clientes</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cliente in clientes %}
+                        <tr>
+                            <td>{{ cliente.nombre }}</td>
+                            <td>{{ cliente.email }}</td>
+                            <td>
+                                <!-- Botón Editar que activa el modal -->
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar{{ cliente.id }}">
+                                    <i class="bi bi-pencil-fill"></i> Editar
+                                </button>
+                                
+                                <!-- Modal para Editar Usuario -->
+                                <div class="modal fade" id="modalEditar{{ cliente.id }}" tabindex="-1" aria-labelledby="modalEditarLabel{{ cliente.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="modalEditarLabel{{ cliente.id }}">Editar Cliente</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                            </div>
+                                            <form method="POST" action="{% url 'gestionar_usuarios' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="cliente_id" value="{{ cliente.id }}">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="nombre" class="form-label">Nombre</label>
+                                                        <input type="text" name="nombre" class="form-control" value="{{ cliente.nombre }} " required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="email" class="form-label">Email</label>
+                                                        <input type="email" name="email" class="form-control" value="{{ cliente.email }}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                    <button type="submit" class="btn btn-primary" name="modificar_cliente">Guardar Cambios</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botón Bloquear/Desbloquear -->
+                                
+                                    <form method="POST" action="{% url 'gestionar_usuarios' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="cliente_id" value="{{ cliente.id }}">
+                                        <button type="submit" class="btn btn-success btn-sm" name="desbloquear_cliente">
+                                            <i class="bi bi-unlock-fill"></i> Desbloquear
+                                        </button>
+                                    </form>
+                                
+                                    <form method="POST" action="{% url 'gestionar_usuarios' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="cliente_id" value="{{ cliente.id }}">
+                                        <button type="submit" class="btn btn-warning btn-sm" name="bloquear_cliente">
+                                            <i class="bi bi-lock-fill"></i> Bloquear
+                                        </button>
+                                    </form>
+                                
+                                <!-- Botón Eliminar -->
+                                <form method="POST" action="{% url 'gestionar_usuarios' %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="cliente_id" value="{{ cliente.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm" name="eliminar_cliente">
+                                        <i class="bi bi-trash-fill"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Similar Section para Administradores -->
+        <section>
+            <h3 class="my-4">Administradores</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins %}
+                        <tr>
+                            <td>{{ admin.nombre }}</td>
+                            <td>{{ admin.email }}</td>
+                            <td>
+                                <!-- Botón Editar que activa el modal -->
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditarAdmin{{ admin.id }}">
+                                    <i class="bi bi-pencil-fill"></i> Editar
+                                </button>
+                                
+                                <!-- Modal para Editar Usuario -->
+                                <div class="modal fade" id="modalEditarAdmin{{ admin.id }}" tabindex="-1" aria-labelledby="modalEditarAdminLabel{{ admin.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="modalEditarAdminLabel{{ admin.id }}">Editar Administrador</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                            </div>
+                                            <form method="POST" action="{% url 'gestionar_usuarios' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="admin_id" value="{{ admin.id }}">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="nombre" class="form-label">Nombre</label>
+                                                        <input type="text" name="nombre" class="form-control" value="{{ admin.nombre }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="email" class="form-label">Email</label>
+                                                        <input type="email" name="email" class="form-control" value="{{ admin.email }}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                    <button type="submit" class="btn btn-primary" name="modificar_admin">Guardar Cambios</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botón Bloquear/Desbloquear -->
+                                
+                                    <form method="POST" action="{% url 'gestionar_usuarios' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="admin_id" value="{{ admin.id }}">
+                                        <button type="submit" class="btn btn-success btn-sm" name="desbloquear_admin">
+                                            <i class="bi bi-unlock-fill"></i> Desbloquear
+                                        </button>
+                                    </form>
+                                
+                                    <form method="POST" action="{% url 'gestionar_usuarios' %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="admin_id" value="{{ admin.id }}">
+                                        <button type="submit" class="btn btn-warning btn-sm" name="bloquear_admin">
+                                            <i class="bi bi-lock-fill"></i> Bloquear
+                                        </button>
+                                    </form>
+                                
+                                <!-- Botón Eliminar -->
+                                <form method="POST" action="{% url 'gestionar_usuarios' %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="admin_id" value="{{ admin.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm" name="eliminar_admin">
+                                        <i class="bi bi-trash-fill"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <div class="container">
+          <div class="row text-center">
+            <div class="col-lg-12">
+              <p>&copy; 2023 RAUDIE. Todos los derechos reservados.</p>
+            </div>
+          </div>
+        </div>
+      </footer><!-- End Footer -->
+    </main>
+
+    <!-- Vendor JS Files -->
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

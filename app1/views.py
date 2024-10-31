@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Proyectos, Cliente, Admin, Tarea, Etapa, Comentario
+from .models import Proyectos, Cliente, Admin, Tarea, Etapa, Comentario, User_block, Admin_user
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import send_mail
@@ -31,8 +31,6 @@ def index(request):
             messages.error(request, 'Hubo un error al enviar tu mensaje. Inténtalo de nuevo.')
 
     return render(request, 'index.html')
-
-
 
 # Vista para el Panel de Control (solo accesible para admins)
 def control(request):
@@ -123,8 +121,6 @@ def control(request):
             return redirect('panel_control')
 
     return render(request, 'PanelDeControl.html', {'proyectos': proyectos, 'admin': admin, 'tareas': tareas, 'etapas': etapas})
-
-
 
 # Vista para el Panel de Seguimiento (solo accesible para clientes)
 def seguimiento(request):
@@ -222,14 +218,20 @@ def custom_authenticate(email, password, user_type):
             pass
     return user
 
-
 # Vista para el login de admin
 def admin_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        admin = custom_authenticate(email=email, password=password, user_type='admin')
+        
+        # Verificar si el usuario está bloqueado
+        admin = Admin.objects.filter(email=email).first()
+        if admin and User_block.objects.filter(usuario_id=admin.id, es_cliente=False).exists():
+            messages.error(request, 'Este usuario está bloqueado.')
+            return render(request, 'admin_login.html')
 
+        # Autenticar al usuario si no está bloqueado
+        admin = custom_authenticate(email=email, password=password, user_type='admin')
         if admin:
             request.session['admin_id'] = admin.id  # Guardar el ID del admin en la sesión
             return redirect('panel_control')  # Redirigir al panel de control
@@ -258,6 +260,7 @@ def admin_register(request):
             nuevo_admin = Admin(nombre=nombre, email=email, password=make_password(password))
             nuevo_admin.save()
             request.session['admin_id'] = nuevo_admin.id  # Iniciar sesión automáticamente
+            messages.success(request, 'Administrador agregado con éxito')
             return redirect('admin_login')  # Redirigir al panel de control
 
     return render(request, 'admin_register.html')
@@ -282,8 +285,9 @@ def cliente_register(request):
             nuevo_cliente = Cliente(nombre=nombre, email=email, password=make_password(password))
             nuevo_cliente.save()
             request.session['cliente_id'] = nuevo_cliente.id  # Iniciar sesión automáticamente
+            messages.success(request, 'Cliente agregado con éxito')
             return redirect('cliente_login')  # Redirigir al panel de control
-
+        
     return render(request, 'cliente_register.html')
 
 
@@ -292,8 +296,15 @@ def cliente_login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        cliente = custom_authenticate(email=email, password=password, user_type='cliente')
+        
+        # Verificar si el cliente está bloqueado
+        cliente = Cliente.objects.filter(email=email).first()
+        if cliente and User_block.objects.filter(usuario_id=cliente.id, es_cliente=True).exists():
+            messages.error(request, 'Este usuario está bloqueado.')
+            return render(request, 'cliente_login.html')
 
+        # Autenticar al cliente si no está bloqueado
+        cliente = custom_authenticate(email=email, password=password, user_type='cliente')
         if cliente:
             request.session['cliente_id'] = cliente.id  # Guardar el ID del cliente en la sesión
             return redirect('panel_seguimiento')  # Redirigir al panel de seguimiento
@@ -302,7 +313,133 @@ def cliente_login(request):
 
     return render(request, 'cliente_login.html')
 
+# Vista para gestionar usuarios
+def gestionar_usuarios(request):
 
+    # Obtén todos los clientes y administradores
+    clientes = Cliente.objects.all()
+    admins = Admin.objects.all()
+    bloqueados = User_block.objects.all()  # Obtener todos los usuarios bloqueados
+
+    # Manejo de peticiones POST
+    if request.method == 'POST':
+        # Edición de clientes
+        if 'modificar_cliente' in request.POST:
+            cliente_id = request.POST.get('cliente_id')
+            nombre = request.POST.get('nombre')
+            email = request.POST.get('email')
+            try:
+                cliente = Cliente.objects.get(id=cliente_id)
+                cliente.nombre = nombre
+                cliente.email = email
+                cliente.save()
+                messages.success(request, 'Cliente editado con éxito.')
+            except Cliente.DoesNotExist:
+                messages.error(request, 'Cliente no encontrado.')
+
+        # Edición de administradores
+        elif 'modificar_admin' in request.POST:
+            admin_id = request.POST.get('admin_id')
+            nombre = request.POST.get('nombre')
+            email = request.POST.get('email')
+            try:
+                admin = Admin.objects.get(id=admin_id)
+                admin.nombre = nombre
+                admin.email = email
+                admin.save()
+                messages.success(request, 'Administrador editado con éxito.')
+            except Admin.DoesNotExist:
+                messages.error(request, 'Administrador no encontrado.')
+
+        # Bloquear cliente
+        elif 'bloquear_cliente' in request.POST:
+            cliente_id = request.POST.get('cliente_id')
+            try:
+                cliente = Cliente.objects.get(id=cliente_id)
+                # Agregar entrada en User_block
+                User_block.objects.create(usuario_id=cliente.id, es_cliente=True)
+                messages.success(request, 'Cliente bloqueado con éxito.')
+            except Cliente.DoesNotExist:
+                messages.error(request, 'Cliente no encontrado.')
+
+        # Desbloquear cliente
+        elif 'desbloquear_cliente' in request.POST:
+            cliente_id = request.POST.get('cliente_id')
+            try:
+                # Eliminar entrada en User_block
+                User_block.objects.filter(usuario_id=cliente_id, es_cliente=True).delete()
+                messages.success(request, 'Cliente desbloqueado con éxito.')
+            except Exception as e:
+                messages.error(request, 'Error al desbloquear cliente: ' + str(e))
+
+        # Bloquear administrador
+        elif 'bloquear_admin' in request.POST:
+            admin_id = request.POST.get('admin_id')
+            try:
+                admin = Admin.objects.get(id=admin_id)
+                # Agregar entrada en User_block
+                User_block.objects.create(usuario_id=admin.id, es_cliente=False)
+                messages.success(request, 'Administrador bloqueado con éxito.')
+            except Admin.DoesNotExist:
+                messages.error(request, 'Administrador no encontrado.')
+
+        # Desbloquear administrador
+        elif 'desbloquear_admin' in request.POST:
+            admin_id = request.POST.get('admin_id')
+            try:
+                # Eliminar entrada en User_block
+                User_block.objects.filter(usuario_id=admin_id, es_cliente=False).delete()
+                messages.success(request, 'Administrador desbloqueado con éxito.')
+            except Exception as e:
+                messages.error(request, 'Error al desbloquear administrador: ' + str(e))
+
+        # Eliminar cliente
+        elif 'eliminar_cliente' in request.POST:
+            cliente_id = request.POST.get('cliente_id')
+            try:
+                cliente = Cliente.objects.get(id=cliente_id)
+                cliente.delete()
+                messages.success(request, 'Cliente eliminado con éxito.')
+            except Cliente.DoesNotExist:
+                messages.error(request, 'Cliente no encontrado.')
+
+        # Eliminar administrador
+        elif 'eliminar_admin' in request.POST:
+            admin_id = request.POST.get('admin_id')
+            try:
+                admin = Admin.objects.get(id=admin_id)
+                admin.delete()
+                messages.success(request, 'Administrador eliminado con éxito.')
+            except Admin.DoesNotExist:
+                messages.error(request, 'Administrador no encontrado.')
+
+    # Renderiza la plantilla con los clientes y administradores
+    return render(request, 'gestionar_usuarios.html', {'clientes': clientes, 'admins': admins, 'bloqueados': bloqueados})
+
+# Vista para login de gestionar usuarios
+def gestion_login(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        try:
+            admin = Admin_user.objects.get(email=email)
+
+            if not admin.activo:
+                messages.error(request, 'Este usuario está bloqueado.')
+                return render(request, 'gestion_login.html')
+
+            # Verificar la contraseña
+            if check_password(password, admin.password):  # Comprobar si la contraseña es correcta
+                request.session['admin_id'] = admin.id  # Guardar el ID del admin en la sesión
+                return redirect('gestionar_usuarios')  # Redirigir al panel de control de usuarios
+            else:
+                messages.error(request, 'Usuario o contraseña incorrectos.')
+
+        except Admin_user.DoesNotExist:
+            messages.error(request, 'Usuario o contraseña incorrectos .')
+
+    return render(request, 'gestion_login.html')
 
 # Vista para cerrar sesión
 def logout(request):

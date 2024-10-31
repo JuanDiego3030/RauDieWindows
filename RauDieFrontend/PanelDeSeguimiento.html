@@ -81,7 +81,7 @@
 <!-- Project Management Section with Timeline -->
 <section id="projects" class="projects section">
   <div class="container">
-    <div class="row d-flex justify-content-between align-items-center mb-4">
+    <div class="justify-content-between align-items-center mb-4">
       <div class="col-lg-12 text-center">
         <h3>Proyectos Actuales</h3>
       </div>
@@ -96,7 +96,7 @@
          {% elif proyecto.estado == 'Completado' %} list-group-item-success 
          {% elif proyecto.estado == 'Cancelado' %} list-group-item-danger 
          {% endif %}">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="justify-content-between align-items-center">
           <div>
             <h4>{{ proyecto.nombre }}</h4>
             <p><strong>Fecha de inicio:</strong> {{ proyecto.fecha_inicio|date:"d/m/Y" }}</p>
@@ -161,7 +161,7 @@
               </div>
             </div>
           </div>
-          <div>
+          <div class="buttonModal" style="display: flex;height: 50px;align-items: baseline;">
             <button class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#modifyProjectModal" 
               data-proyecto-id="{{ proyecto.id }}" 
               data-nombre="{{ proyecto.nombre }}" 
@@ -170,7 +170,7 @@
               data-requerimientos="{{ proyecto.requerimientos }}">
               Solicitar Cambios
             </button>
-            <br>
+            &nbsp;
             <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addCommentModal{{ proyecto.id }}">Agregar Comentario</button>
           </div>
         </div>
@@ -185,7 +185,6 @@
   </div>
 </section>
 <!-- End Project Management Section -->
-
 
     <!-- Project Request Form Section -->
     <section id="request" class="request section">

@@ -1,7 +1,7 @@
 from django.utils import timezone
 from django.db import models
 
-# Custom model for Admins
+# modelo Admins
 class Admin(models.Model):
     nombre = models.CharField(max_length=100)  # Agregado campo de nombre
     email = models.EmailField(max_length=255, unique=True)
@@ -48,7 +48,7 @@ class Tarea(models.Model):
     def __str__(self):
         return self.nombre
 
-# Nueva tabla para Etapa en proyectos o tareas
+# Nueva tabla para Etapa en proyectos
 class Etapa(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
@@ -59,7 +59,7 @@ class Etapa(models.Model):
     def __str__(self):
         return f"{self.nombre} - {self.proyecto.nombre}"
 
-# Nueva tabla para Comentarios en proyectos o tareas
+# Nueva tabla para Comentarios en proyectos
 class Comentario(models.Model):
     contenido = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -68,24 +68,24 @@ class Comentario(models.Model):
 
     def __str__(self):
         return f"Comentario de {self.autor} sobre {self.proyecto.nombre}"
-
-# Nueva tabla para Documentos asociados a proyectos o tareas
-class Documento(models.Model):
-    titulo = models.CharField(max_length=200)
-    archivo = models.FileField(upload_to='documentos/')
-    fecha_subida = models.DateTimeField(auto_now_add=True)
-    proyecto = models.ForeignKey(Proyectos, on_delete=models.CASCADE, related_name="documentos", null=True, blank=True)
-    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name="documentos", null=True, blank=True)
-
-    def __str__(self):
-        return self.titulo
-
-# Nueva tabla para Asignaciones de tareas a clientes o admins
-class Asignacion(models.Model):
-    tarea = models.ForeignKey(Tarea, on_delete=models.CASCADE, related_name="asignaciones")
-    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
-    admin = models.ForeignKey(Admin, on_delete=models.SET_NULL, null=True, blank=True)
-    fecha_asignacion = models.DateTimeField(auto_now_add=True)
+    
+# Modelo de administración para gestión de usuarios
+class Admin_user(models.Model):
+    nombre = models.CharField(max_length=100)  # Nombre del usuario admin
+    email = models.EmailField(max_length=255, unique=True)  # Correo del usuario admin
+    password = models.CharField(max_length=255)  # Contraseña del usuario admin
+    fecha_registro = models.DateTimeField(auto_now_add=True)  # Fecha de registro del usuario
+    activo = models.BooleanField(default=True)  # Estado activo o inactivo del usuario admin
 
     def __str__(self):
-        return f"Asignación de {self.tarea.nombre}"
+        return f"Admin User: {self.nombre} (Activo: {'Sí' if self.activo else 'No'})"
+
+# Modelo para bloquear usuarios (Clientes y Admins)
+class User_block(models.Model):
+    usuario_id = models.IntegerField()  # ID del usuario bloqueado
+    es_cliente = models.BooleanField()  # True si es un cliente, False si es admin
+    fecha_bloqueo = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        tipo_usuario = "Cliente" if self.es_cliente else "Admin"
+        return f"{tipo_usuario} bloqueado ID: {self.usuario_id}"

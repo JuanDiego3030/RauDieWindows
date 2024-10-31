@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'RauDie.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgresql://postgres:bxKzoKRFBNkReSNemBkYaRqitXAoocBb@junction.proxy.rlwy.net:44558/railway')
+    'default': dj_database_url.config(default='postgresql://postgres:FEmLlZkqGlybXgfLhSZtsbkpsKVNFjAZ@junction.proxy.rlwy.net:59481/railway')
 }
 
 
@@ -148,4 +148,3 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'juanxcosa@gmail.com'  # Tu correo electrónico
 EMAIL_HOST_PASSWORD = 'ykln ddza qdel qfjf'  # Tu contraseña de correo
-
