@@ -424,9 +424,57 @@ def gestionar_usuarios(request):
                 messages.success(request, 'Administrador eliminado con éxito.')
             except Admin.DoesNotExist:
                 messages.error(request, 'Administrador no encontrado.')
+    
+     # Cambiar contraseña de Cliente
+    if 'cambiar_contrasena_cliente' in request.POST:
+        usuario_id = request.POST.get('usuario_id')
+        nueva_contrasena = request.POST.get('nueva_contrasena')
+        try:
+            cliente = Cliente.objects.get(id=usuario_id)
+            cliente.password = make_password(nueva_contrasena)  # Encripta la contraseña para Cliente
+            cliente.save()
+            messages.success(request, 'Contraseña de cliente cambiada con éxito.')
+        except Cliente.DoesNotExist:
+            messages.error(request, 'Cliente no encontrado.')
 
+    # Cambiar contraseña de Admin
+    elif 'cambiar_contrasena_admin' in request.POST:
+        usuario_id = request.POST.get('usuario_id')
+        nueva_contrasena = request.POST.get('nueva_contrasena')
+        try:
+            admin = Admin.objects.get(id=usuario_id)
+            admin.password = make_password(nueva_contrasena)  # Encripta la contraseña para Admin
+            admin.save()
+            messages.success(request, 'Contraseña de administrador cambiada con éxito.')
+        except Admin.DoesNotExist:
+            messages.error(request, 'Administrador no encontrado.')
+
+    # Obtener usuarios bloqueados
+    usuarios_bloqueados = User_block.objects.all()
+    clientes_bloqueados = []
+    admins_bloqueados = []
+
+    for bloqueo in usuarios_bloqueados:
+        if bloqueo.es_cliente:
+            try:
+                cliente = Cliente.objects.get(id=bloqueo.usuario_id)
+                clientes_bloqueados.append(cliente)
+            except Cliente.DoesNotExist:
+                pass
+        else:
+            try:
+                admin = Admin.objects.get(id=bloqueo.usuario_id)
+                admins_bloqueados.append(admin)
+            except Admin.DoesNotExist:
+                pass
     # Renderiza la plantilla con los clientes y administradores
-    return render(request, 'gestionar_usuarios.html', {'clientes': clientes, 'admins': admins, 'bloqueados': bloqueados})
+    return render(request, 'gestionar_usuarios.html', {
+       'clientes': clientes,
+       'admins': admins,
+       'bloqueados': bloqueados,
+       'clientes_bloqueados': clientes_bloqueados,
+       'admins_bloqueados': admins_bloqueados
+    })
 
 # Vista para login de gestionar usuarios
 def gestion_login(request):

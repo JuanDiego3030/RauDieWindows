@@ -139,6 +139,39 @@
                                         <i class="bi bi-trash-fill"></i> Eliminar
                                     </button>
                                 </form>
+
+                                <!-- Botón Cambiar Contraseña para Cliente -->
+<button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCambiarContrasenaCliente{{ cliente.id }}">
+    <i class="bi bi-key-fill"></i> Cambiar Contraseña Cliente
+</button>
+
+<!-- Modal para Cambiar Contraseña de Cliente -->
+<div class="modal fade" id="modalCambiarContrasenaCliente{{ cliente.id }}" tabindex="-1" aria-labelledby="modalCambiarContrasenaClienteLabel{{ cliente.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCambiarContrasenaClienteLabel{{ cliente.id }}">Cambiar Contraseña Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="POST" action="{% url 'gestionar_usuarios' %}">
+                {% csrf_token %}
+                <input type="hidden" name="usuario_id" value="{{ cliente.id }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nueva_contrasena_cliente" class="form-label">Nueva Contraseña</label>
+                        <input type="password" name="nueva_contrasena" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" name="cambiar_contrasena_cliente">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
                             </td>
                         </tr>
                         {% endfor %}
@@ -226,6 +259,39 @@
                                         <i class="bi bi-trash-fill"></i> Eliminar
                                     </button>
                                 </form>
+
+                                <!-- Botón Cambiar Contraseña para Administrador -->
+<button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCambiarContrasenaAdmin{{ admin.id }}">
+    <i class="bi bi-key-fill"></i> Cambiar Contraseña Admin
+</button>
+
+<!-- Modal para Cambiar Contraseña de Administrador -->
+<div class="modal fade" id="modalCambiarContrasenaAdmin{{ admin.id }}" tabindex="-1" aria-labelledby="modalCambiarContrasenaAdminLabel{{ admin.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCambiarContrasenaAdminLabel{{ admin.id }}">Cambiar Contraseña Admin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form method="POST" action="{% url 'gestionar_usuarios' %}">
+                {% csrf_token %}
+                <input type="hidden" name="usuario_id" value="{{ admin.id }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nueva_contrasena_admin" class="form-label">Nueva Contraseña</label>
+                        <input type="password" name="nueva_contrasena" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" name="cambiar_contrasena_admin">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
                             </td>
                         </tr>
                         {% endfor %}
@@ -233,6 +299,64 @@
                 </table>
             </div>
         </section>
+
+        <h3 class="mt-4 mb-3">Usuarios Bloqueados</h3>
+
+        <!-- Tabla de Clientes Bloqueados -->
+        <h4>Clientes Bloqueados</h4>
+        {% if clientes_bloqueados %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha de Bloqueo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cliente in clientes_bloqueados %}
+                            <tr>
+                                <td>{{ cliente.nombre }}</td>
+                                <td>{{ cliente.email }}</td>
+                                <td>{{ cliente.fecha_bloqueo|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No hay clientes bloqueados.</p>
+        {% endif %}
+        
+        <!-- Tabla de Administradores Bloqueados -->
+        <h4>Administradores Bloqueados</h4>
+        {% if admins_bloqueados %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha de Bloqueo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins_bloqueados %}
+                            <tr>
+                                <td>{{ admin.nombre }}</td>
+                                <td>{{ admin.email }}</td>
+                                <td>{{ admin.fecha_bloqueo|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No hay administradores bloqueados.</p>
+        {% endif %}
+        
+
         
     <!-- Footer -->
     <footer id="footer" class="footer">

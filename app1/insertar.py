@@ -19,3 +19,4 @@ for admin in admin_data:
     )
 
 print("Datos de los administradores agregados con éxito.")
+
