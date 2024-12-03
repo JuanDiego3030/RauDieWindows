@@ -83,7 +83,10 @@ WSGI_APPLICATION = 'RauDie.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(default='postgresql://postgres:FEmLlZkqGlybXgfLhSZtsbkpsKVNFjAZ@junction.proxy.rlwy.net:59481/railway')
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # Ubicación del archivo de la base de datos
+    }
 }
 
 

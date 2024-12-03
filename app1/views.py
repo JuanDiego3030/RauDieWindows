@@ -252,6 +252,11 @@ def admin_login(request):
 
 # Vista para registrar un admin
 def admin_register(request):
+
+    admin_id = request.session.get('admin_id')
+    if not admin_id:
+        return redirect('admin_login')  # Redirige al login si no está autenticado
+    
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
